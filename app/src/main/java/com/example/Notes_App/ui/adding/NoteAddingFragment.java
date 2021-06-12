@@ -62,6 +62,7 @@ public class NoteAddingFragment extends Fragment {
 
                 note = new Note(noteName, noteDescription, date);
 
+
                 notes.addNotes(note);
 
             }
