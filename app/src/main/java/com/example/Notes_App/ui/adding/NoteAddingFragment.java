@@ -1,36 +1,39 @@
 package com.example.Notes_App.ui.adding;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class NoteAddingFragment extends Fragment {
 
     Note note;
-    NoteRepoImpl notes;
+    NoteRepoImpl noteRepo;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    EditText editText;
+    EditText editText1;
 
-    private String mParam1;
-    private String mParam2;
 
     public NoteAddingFragment() {
     }
+
     public static NoteAddingFragment newInstance() {
-        return new NoteAddingFragment();
+        NoteAddingFragment fragment = new NoteAddingFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -47,27 +50,26 @@ public class NoteAddingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        editText = view.findViewById(R.id.fragment_note_adding_name);
+        editText1 = view.findViewById(R.id.fragment_note_adding_description);
+    }
 
-        FloatingActionButton fab = view.findViewById(R.id.confirm_button);
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_add_note_fragment, menu);
+    }
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText editText = view.findViewById(R.id.fragment_note_adding_name);
-                EditText editText1 = view.findViewById(R.id.fragment_note_adding_description);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.confirm_option) {
+            String noteName = editText.getText().toString();
+            String noteDescription = editText1.getText().toString();
+            long noteDate = System.currentTimeMillis();
 
-                String noteName = editText.getText().toString();
-                String noteDescription = editText1.getText().toString();
-                long date = System.currentTimeMillis();
-
-                note = new Note(noteName, noteDescription, date);
-
-
-                notes.addNotes(note);
-
-            }
-        });
-
-
+            note = new Note(noteName, noteDescription, noteDate);
+            noteRepo.addNote(note);
+            getParentFragmentManager().popBackStack();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

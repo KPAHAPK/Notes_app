@@ -9,7 +9,8 @@
     android:layout_marginEnd="@dimen/margin_default"
     android:background="@drawable/item_note_bg"
     android:orientation="vertical"
-    android:padding="@dimen/padding_default">
+    android:padding="@dimen/padding_default"
+    android:checkable="true">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/item_note_name"
