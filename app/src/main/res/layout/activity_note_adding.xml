@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/note_adding_activity"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/notes_list_fragment"
-    android:name="com.example.Notes_App.ui.list.NotesListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.list.MainActivity" />
+    tools:context=".ui.adding.NoteAddingActivity">
+
+</androidx.fragment.app.FragmentContainerView>
