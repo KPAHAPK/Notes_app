@@ -15,15 +15,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
+import com.example.Notes_App.ui.NotesAdapter;
 import com.example.Notes_App.ui.adding.NoteAddingFragment;
 
 import java.util.List;
 
 public class NotesListFragment extends Fragment {
+
+    NoteRepoImpl noteRepo;
 
     public interface OnNotesClicked {
         void onNotesClicked(Note note);
@@ -44,6 +49,8 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        noteRepo = new NoteRepoImpl();
 
         if (context instanceof OnNotesClicked) {
             onNotesClicked = (OnNotesClicked) context;
@@ -69,15 +76,23 @@ public class NotesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LinearLayout linearLayout = view.findViewById(R.id.note_list);
+        RecyclerView recyclerView = view.findViewById(R.id.notes_list);
 
-        NoteRepoImpl noteRepo = new NoteRepoImpl();
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+
 
         List<Note> noteList = noteRepo.getNotes();
 
+        NotesAdapter notesAdapter = new NotesAdapter();
+        notesAdapter.setData(noteList);
+
+
+
+        noteRepo = new NoteRepoImpl();
+
         for (Note note : noteList) {
 
-            View itemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_note, linearLayout, false);
 
             TextView noteName = itemView.findViewById(R.id.item_note_name);
             TextView noteDescription = itemView.findViewById(R.id.item_note_description);
@@ -97,7 +112,7 @@ public class NotesListFragment extends Fragment {
                 }
             });
 
-            linearLayout.addView(itemView);
+            recyclerView.addView(itemView);
         }
     }
 

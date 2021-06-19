@@ -13,18 +13,10 @@
         android:layout_height="match_parent" />
 
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
-            android:id="@+id/note_list"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/notes_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
-
-    </androidx.core.widget.NestedScrollView>
+            android:layout_height="match_parent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
