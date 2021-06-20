@@ -1,7 +1,7 @@
 package com.example.Notes_App.ui.details;
 
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,7 +9,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.NotesStorage;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
@@ -26,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class NoteDetailsFragment extends Fragment {
@@ -37,6 +39,8 @@ public class NoteDetailsFragment extends Fragment {
     DatePickerDialog datePickerDialog;
     NoteRepoImpl noteRepo;
     Note note;
+    AppRouteManger appRouteManger;
+    NotesStorage notesStorage;
 
     public NoteDetailsFragment() {
     }
@@ -50,10 +54,25 @@ public class NoteDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (requireActivity() instanceof AppRouteManger) {
+            appRouteManger = (AppRouteManger) requireActivity();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        appRouteManger = null;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        notesStorage = new NotesStorage(requireContext());
+        noteRepo = new NoteRepoImpl();
         setHasOptionsMenu(true);
     }
 
@@ -80,34 +99,31 @@ public class NoteDetailsFragment extends Fragment {
             noteDate.setText(note.getDate().toString());
 
         }
-
-        noteDate.setOnClickListener(v -> {
-            final Calendar cldr = Calendar.getInstance();
-            int day = cldr.get(Calendar.DAY_OF_MONTH);
-            int month = cldr.get(Calendar.MONTH);
-            int year = cldr.get(Calendar.YEAR);
-            datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view1, int year, int month, int dayOfMonth) {
-                    String sDate = String.format("%d.%d.%d", dayOfMonth, month, year);
-                    noteDate.setText(sDate);
-                    try {
-                        Date dateFormat = new SimpleDateFormat("dd.MM.yyyy").parse(sDate);
-                        long dateMilliseconds = 0;
-                        if (dateFormat != null) {
-                            dateMilliseconds = dateFormat.getTime();
-                        }
-                        if (getArguments() != null) {
-                            Note note = getArguments().getParcelable(ARG_PARAM1);
-                            note.setDate(dateMilliseconds);
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, year, month, day);
-            datePickerDialog.show();
-        });
+//TODO: create DatePicker in Editor
+//        noteDate.setOnClickListener(v -> {
+//            final Calendar cldr = Calendar.getInstance();
+//            int day = cldr.get(Calendar.DAY_OF_MONTH);
+//            int month = cldr.get(Calendar.MONTH);
+//            int year = cldr.get(Calendar.YEAR);
+//            datePickerDialog = new DatePickerDialog(getContext(), (view1, year1, month1, dayOfMonth) -> {
+//                String sDate = String.format(Locale.ENGLISH, "%d.%d.%d", dayOfMonth, month1, year1);
+//                noteDate.setText(sDate);
+//                try {
+//                    Date dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH).parse(sDate);
+//                    long dateMilliseconds = 0;
+//                    if (dateFormat != null) {
+//                        dateMilliseconds = dateFormat.getTime();
+//                    }
+//                    if (getArguments() != null) {
+//                        Note note = getArguments().getParcelable(ARG_PARAM1);
+//                        note.setDate(dateMilliseconds);
+//                    }
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//            }, year, month, day);
+//            datePickerDialog.show();
+//        });
     }
 
     @Override
@@ -120,6 +136,8 @@ public class NoteDetailsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.edit_note_option) {
             Toast.makeText(getContext(), "Edit note", Toast.LENGTH_SHORT).show();
+            appRouteManger.showNoteEditor(note);
+            //TODO: edit note option
 
         }
         if (item.getItemId() == R.id.delete_option) {
@@ -128,15 +146,10 @@ public class NoteDetailsFragment extends Fragment {
                     .setIcon(R.drawable.ic_baseline_warning_24)
                     .setTitle("Are you sure about your decision?")
                     .setMessage("This note will be deleted.\nProceed?")
-                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (getArguments() != null) {
-                                noteRepo = new NoteRepoImpl();
-                                noteRepo.removeNote(note);
-                                getParentFragmentManager().popBackStack();
-                            }
-                        }
+                    .setPositiveButton("yes", (dialog, which) -> {
+                        noteRepo.removeNote(note);
+                        notesStorage.setList("notes", noteRepo.getNotes());
+                        getParentFragmentManager().popBackStack();
                     })
                     .setNegativeButton("No", null).show();
 

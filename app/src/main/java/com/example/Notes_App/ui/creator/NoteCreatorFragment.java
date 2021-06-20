@@ -1,4 +1,4 @@
-package com.example.Notes_App.ui.adding;
+package com.example.Notes_App.ui.creator;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,28 +14,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.Notes_App.domain.NotesStorage;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.ui.NotesAdapter;
+import com.example.Notes_App.domain.NotesAdapter;
 
-public class NoteAddingFragment extends Fragment {
+public class NoteCreatorFragment extends Fragment {
 
     public static final String TAG = "NoteAddingFragment";
 
     Note note;
     NoteRepoImpl noteRepo;
+    NotesStorage notesStorage;
+    NotesAdapter notesAdapter;
 
     EditText editText;
     EditText editText1;
-    NotesAdapter notesAdapter;
 
 
-    public NoteAddingFragment() {
+    public NoteCreatorFragment() {
     }
 
-    public static NoteAddingFragment newInstance() {
-        NoteAddingFragment fragment = new NoteAddingFragment();
+    public static NoteCreatorFragment newInstance() {
+        NoteCreatorFragment fragment = new NoteCreatorFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -50,6 +52,8 @@ public class NoteAddingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         noteRepo = new NoteRepoImpl();
+        notesAdapter = new NotesAdapter();
+        notesStorage = new NotesStorage(requireContext());
         super.onCreate(savedInstanceState);
     }
 
@@ -62,7 +66,6 @@ public class NoteAddingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        notesAdapter = new NotesAdapter();
         editText = view.findViewById(R.id.fragment_note_adding_name);
         editText1 = view.findViewById(R.id.fragment_note_adding_description);
     }
@@ -75,16 +78,17 @@ public class NoteAddingFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.confirm_option) {
-
-
             String noteName = editText.getText().toString();
             String noteDescription = editText1.getText().toString();
             long noteDate = System.currentTimeMillis();
 
             note = new Note(noteName, noteDescription, noteDate);
             noteRepo.addNote(note);
-            notesAdapter.notifyDataSetChanged();
+            notesStorage.setList("notes", noteRepo.getNotes());
+
             getParentFragmentManager().popBackStack();
+
+
         }
         return super.onOptionsItemSelected(item);
     }

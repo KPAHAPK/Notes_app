@@ -1,6 +1,5 @@
-package com.example.Notes_App.ui.list;
+package com.example.Notes_App;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,24 +11,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.example.Notes_App.AboutFragment;
-import com.example.Notes_App.AppRouteManger;
-import com.example.Notes_App.R;
+import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
-import com.example.Notes_App.ui.adding.NoteAddingFragment;
+import com.example.Notes_App.domain.NotesAdapter;
+import com.example.Notes_App.ui.about.AboutFragment;
+import com.example.Notes_App.ui.creator.NoteCreatorFragment;
 import com.example.Notes_App.ui.details.NoteDetailsFragment;
+import com.example.Notes_App.ui.editor.NoteEditorFragment;
+import com.example.Notes_App.ui.list.NotesListFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements AppRouteManger {
 
     FragmentManager fragmentManager;
+    public static NotesAdapter notesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        notesAdapter = new NotesAdapter();
 
         fragmentManager = getSupportFragmentManager();
 
@@ -45,19 +48,17 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.settings_option) {
-                    Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                if (item.getItemId() == R.id.about_option) {
-                    showAbout();
-                    return true;
-                }
-                return false;
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.settings_option) {
+                //TODO: setting option
+                Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                return true;
             }
+            if (item.getItemId() == R.id.about_option) {
+                showAbout();
+                return true;
+            }
+            return false;
         });
 
 
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
         }
 
     }
+    //TODO: Landscape orientation mode
+
 
     @Override
     public void showNotesList() {
@@ -93,40 +96,23 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
     }
 
     @Override
-    public void showNoteAddingFragment() {
+    public void showNoteCreator() {
         fragmentManager
                 .beginTransaction()
-                .addToBackStack(NoteAddingFragment.TAG)
-                .replace(R.id.main_container, NoteAddingFragment.newInstance(), NoteAddingFragment.TAG)
+                .addToBackStack(NoteCreatorFragment.TAG)
+                .replace(R.id.main_container, NoteCreatorFragment.newInstance(), NoteCreatorFragment.TAG)
                 .commit();
     }
 
-//    @Override
-//    public void onNotesClicked(Note note) {
-//
-//        boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-//
-//
-//        if (isLandscape) {
-//
-//
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .add(R.id.secondary_container, NoteDetailsFragment.newInstance(note), "NoteDetailsFragment")
-//                    .commit();
-//
-//        } else {
-////            Intent intent = new Intent(this, NoteDetailsActivity.class);
-////            intent.putExtra(NoteDetailsActivity.KEY, note);
-////            startActivity(intent);
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-//                    .addToBackStack(null)
-//                    .replace(R.id.main_container, NoteDetailsFragment.newInstance(note), "NoteDetailsFragment")
-//                    .commit();
-//        }
-//    }
+    @Override
+    public void showNoteEditor(Note note) {
+        fragmentManager
+                .beginTransaction()
+                .addToBackStack(NoteCreatorFragment.TAG)
+                .replace(R.id.main_container, NoteEditorFragment.newInstance(note), NoteEditorFragment.TAG)
+                .commit();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

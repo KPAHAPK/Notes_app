@@ -1,4 +1,4 @@
-package com.example.Notes_App.ui;
+package com.example.Notes_App.domain;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Notes_App.R;
-import com.example.Notes_App.domain.Note;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         this.clickListener = clickListener;
     }
 
-    private List<Note> notesList = new ArrayList<>();
+    private final List<Note> notesList = new ArrayList<>();
 
     public void setData(List<Note> list) {
         notesList.clear();
         notesList.addAll(list);
     }
-
 
     @NonNull
     @Override
@@ -52,7 +50,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         holder.noteName.setText(note.getName());
         holder.noteDescription.setText(note.getDescription());
-        holder.noteDate.setText(note.getDate().toString());
+        holder.noteDate.setText(note.getDate());
     }
 
     @Override

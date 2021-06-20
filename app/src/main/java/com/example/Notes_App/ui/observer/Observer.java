@@ -1,4 +1,4 @@
-package com.example.Notes_App;
+package com.example.Notes_App.ui.observer;
 
 import com.example.Notes_App.domain.Note;
 
