@@ -10,7 +10,10 @@ public class NoteRepoImpl implements NoteRepo {
 
     @Override
     public List<Note> getNotes() {
-        notes.add(new Note("24124124fasfawrwefwewfew","fsfsdsaeasdsaeew",System.currentTimeMillis()));
+        notes = new ArrayList<>();
+        notes.add( new Note("24124124fasfawrwefwewfew","fsfsdsaeasdsaeew",System.currentTimeMillis()));
+        notes.add( new Note("24124124fasfawrwefwewfew","fsfsdsaeasdsaeew",System.currentTimeMillis()));
+        notes.add( new Note("24124124fasfawrwefwewfew","fsfsdsaeasdsaeew",System.currentTimeMillis()));
         return notes;
     }
 

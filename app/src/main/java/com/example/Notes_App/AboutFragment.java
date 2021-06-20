@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 
 public class AboutFragment extends Fragment {
 
+    public final static String TAG = "AboutFragment";
+
     public AboutFragment() {
     }
 

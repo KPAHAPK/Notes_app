@@ -30,6 +30,8 @@ import java.util.Date;
 
 public class NoteDetailsFragment extends Fragment {
 
+    public final static String TAG = "NoteDetailsFragment";
+
     private static final String ARG_PARAM1 = "param1";
 
     DatePickerDialog datePickerDialog;
@@ -79,35 +81,32 @@ public class NoteDetailsFragment extends Fragment {
 
         }
 
-        noteDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Calendar cldr = Calendar.getInstance();
-                int day = cldr.get(Calendar.DAY_OF_MONTH);
-                int month = cldr.get(Calendar.MONTH);
-                int year = cldr.get(Calendar.YEAR);
-                datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        String sDate = String.format("%d.%d.%d", dayOfMonth, month, year);
-                        noteDate.setText(sDate);
-                        try {
-                            Date dateFormat = new SimpleDateFormat("dd.MM.yyyy").parse(sDate);
-                            long dateMilliseconds = 0;
-                            if (dateFormat != null) {
-                                dateMilliseconds = dateFormat.getTime();
-                            }
-                            if (getArguments() != null) {
-                                Note note = getArguments().getParcelable(ARG_PARAM1);
-                                note.setDate(dateMilliseconds);
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+        noteDate.setOnClickListener(v -> {
+            final Calendar cldr = Calendar.getInstance();
+            int day = cldr.get(Calendar.DAY_OF_MONTH);
+            int month = cldr.get(Calendar.MONTH);
+            int year = cldr.get(Calendar.YEAR);
+            datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view1, int year, int month, int dayOfMonth) {
+                    String sDate = String.format("%d.%d.%d", dayOfMonth, month, year);
+                    noteDate.setText(sDate);
+                    try {
+                        Date dateFormat = new SimpleDateFormat("dd.MM.yyyy").parse(sDate);
+                        long dateMilliseconds = 0;
+                        if (dateFormat != null) {
+                            dateMilliseconds = dateFormat.getTime();
                         }
+                        if (getArguments() != null) {
+                            Note note = getArguments().getParcelable(ARG_PARAM1);
+                            note.setDate(dateMilliseconds);
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-                }, year, month, day);
-                datePickerDialog.show();
-            }
+                }
+            }, year, month, day);
+            datePickerDialog.show();
         });
     }
 

@@ -1,5 +1,6 @@
 package com.example.Notes_App.ui.list;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,33 +9,32 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.Notes_App.AppRouteManger;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
 import com.example.Notes_App.ui.NotesAdapter;
-import com.example.Notes_App.ui.adding.NoteAddingFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotesListFragment extends Fragment {
 
+    public final static String TAG = "NotesListFragment";
+
     NoteRepoImpl noteRepo;
-
-    public interface OnNotesClicked {
-        void onNotesClicked(Note note);
-    }
-
-    private OnNotesClicked onNotesClicked;
+    NotesAdapter notesAdapter;
+    AppRouteManger appRouter;
 
     public NotesListFragment() {
     }
@@ -51,9 +51,9 @@ public class NotesListFragment extends Fragment {
         super.onAttach(context);
 
         noteRepo = new NoteRepoImpl();
-
-        if (context instanceof OnNotesClicked) {
-            onNotesClicked = (OnNotesClicked) context;
+        notesAdapter = new NotesAdapter();
+        if (requireActivity() instanceof AppRouteManger) {
+            appRouter = (AppRouteManger) requireActivity();
         }
     }
 
@@ -63,7 +63,6 @@ public class NotesListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -72,50 +71,27 @@ public class NotesListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_note_list, container, false);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView recyclerView = view.findViewById(R.id.notes_list);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
 
 
-        List<Note> noteList = noteRepo.getNotes();
+        List<Note> noteList;
+        noteList = noteRepo.getNotes();
 
-        NotesAdapter notesAdapter = new NotesAdapter();
         notesAdapter.setData(noteList);
 
+        notesAdapter.notifyDataSetChanged();
 
+        notesAdapter.setClickListener(note -> appRouter.showNoteDetails(note));
 
-        noteRepo = new NoteRepoImpl();
-
-        for (Note note : noteList) {
-
-
-            TextView noteName = itemView.findViewById(R.id.item_note_name);
-            TextView noteDescription = itemView.findViewById(R.id.item_note_description);
-            TextView noteDate = itemView.findViewById(R.id.item_note_date);
-
-            noteName.setText(note.getName());
-            noteDescription.setText(note.getDescription());
-            noteDate.setText(note.getDate().toString());
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    itemView.setSelected(true);
-                    if (onNotesClicked != null) {
-                        onNotesClicked.onNotesClicked(note);
-                    }
-                }
-            });
-
-            recyclerView.addView(itemView);
-        }
+        recyclerView.setAdapter(notesAdapter);
     }
-
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -125,12 +101,7 @@ public class NotesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_note_option) {
-            Toast.makeText(getContext(), "Add note", Toast.LENGTH_SHORT).show();
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .replace(R.id.fragment_note_list_container, NoteAddingFragment.newInstance(), "NoteAddingFragment")
-                    .commit();
+            appRouter.showNoteAddingFragment();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -11,21 +11,27 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.Notes_App.AboutFragment;
+import com.example.Notes_App.AppRouteManger;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
+import com.example.Notes_App.ui.adding.NoteAddingFragment;
 import com.example.Notes_App.ui.details.NoteDetailsFragment;
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity implements NotesListFragment.OnNotesClicked {
+public class MainActivity extends AppCompatActivity implements AppRouteManger {
+
+    FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        fragmentManager = getSupportFragmentManager();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -47,12 +53,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
                     return true;
                 }
                 if (item.getItemId() == R.id.about_option) {
-                    Toast.makeText(MainActivity.this, "About", Toast.LENGTH_SHORT).show();
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .addToBackStack(null)
-                            .replace(R.id.main_container, AboutFragment.newInstance(), "AboutFragment")
-                            .commit();
+                    showAbout();
                     return true;
                 }
                 return false;
@@ -60,40 +61,72 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
         });
 
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                .replace(R.id.main_container, NotesListFragment.newInstance(), "NotesListFragment")
-                .commit();
+        if (savedInstanceState == null) {
+            showNotesList();
+        }
 
     }
 
     @Override
-    public void onNotesClicked(Note note) {
-
-        boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-
-
-        if (isLandscape) {
-
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.secondary_container, NoteDetailsFragment.newInstance(note), "NoteDetailsFragment")
-                    .commit();
-
-        } else {
-//            Intent intent = new Intent(this, NoteDetailsActivity.class);
-//            intent.putExtra(NoteDetailsActivity.KEY, note);
-//            startActivity(intent);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                    .addToBackStack(null)
-                    .replace(R.id.main_container, NoteDetailsFragment.newInstance(note), "NoteDetailsFragment")
-                    .commit();
-        }
+    public void showNotesList() {
+        fragmentManager.beginTransaction()
+                .addToBackStack(NotesListFragment.TAG)
+                .replace(R.id.main_container, NotesListFragment.newInstance(), NotesListFragment.TAG)
+                .commit();
     }
+
+    @Override
+    public void showNoteDetails(Note note) {
+        fragmentManager.beginTransaction()
+                .addToBackStack(NoteDetailsFragment.TAG)
+                .replace(R.id.main_container, NoteDetailsFragment.newInstance(note), NoteDetailsFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void showAbout() {
+        fragmentManager
+                .beginTransaction()
+                .addToBackStack(AboutFragment.TAG)
+                .replace(R.id.main_container, AboutFragment.newInstance(), AboutFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void showNoteAddingFragment() {
+        fragmentManager
+                .beginTransaction()
+                .addToBackStack(NoteAddingFragment.TAG)
+                .replace(R.id.main_container, NoteAddingFragment.newInstance(), NoteAddingFragment.TAG)
+                .commit();
+    }
+
+//    @Override
+//    public void onNotesClicked(Note note) {
+//
+//        boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+//
+//
+//        if (isLandscape) {
+//
+//
+//            getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .add(R.id.secondary_container, NoteDetailsFragment.newInstance(note), "NoteDetailsFragment")
+//                    .commit();
+//
+//        } else {
+////            Intent intent = new Intent(this, NoteDetailsActivity.class);
+////            intent.putExtra(NoteDetailsActivity.KEY, note);
+////            startActivity(intent);
+//            getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+//                    .addToBackStack(null)
+//                    .replace(R.id.main_container, NoteDetailsFragment.newInstance(note), "NoteDetailsFragment")
+//                    .commit();
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
