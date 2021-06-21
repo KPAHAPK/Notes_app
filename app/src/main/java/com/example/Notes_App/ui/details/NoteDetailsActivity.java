@@ -1,8 +1,8 @@
 package com.example.Notes_App.ui.details;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
@@ -18,7 +18,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_details);
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
 
             note = getIntent().getParcelableExtra(KEY);
 

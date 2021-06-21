@@ -1,39 +1,39 @@
 package com.example.Notes_App.ui.details;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.DatePicker;
-import android.widget.TextView;
-
-import com.example.Notes_App.Observer;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.ui.list.MainActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 
-public class NoteDetailsFragment extends Fragment{
+public class NoteDetailsFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
 
     DatePickerDialog datePickerDialog;
-    NoteRepoImpl notes;
+    NoteRepoImpl noteRepo;
     Note note;
 
     public NoteDetailsFragment() {
@@ -49,7 +49,10 @@ public class NoteDetailsFragment extends Fragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -63,13 +66,12 @@ public class NoteDetailsFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
 
 
-
         TextView noteName = view.findViewById(R.id.fragment_note_details_name);
         TextView noteDescription = view.findViewById(R.id.fragment_note_details_description);
         TextView noteDate = view.findViewById(R.id.fragment_note_details_date);
 
         if (getArguments() != null) {
-            Note note = getArguments().getParcelable(ARG_PARAM1);
+            note = getArguments().getParcelable(ARG_PARAM1);
 
             noteName.setText(note.getName());
             noteDescription.setText(note.getDescription());
@@ -107,7 +109,39 @@ public class NoteDetailsFragment extends Fragment{
                 datePickerDialog.show();
             }
         });
+    }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_details_fragment, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.edit_note_option) {
+            Toast.makeText(getContext(), "Edit note", Toast.LENGTH_SHORT).show();
+
+        }
+        if (item.getItemId() == R.id.delete_option) {
+            Toast.makeText(getContext(), "Delete note", Toast.LENGTH_SHORT).show();
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setIcon(R.drawable.ic_baseline_warning_24)
+                    .setTitle("Are you sure about your decision?")
+                    .setMessage("This note will be deleted.\nProceed?")
+                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (getArguments() != null) {
+                                noteRepo = new NoteRepoImpl();
+                                noteRepo.removeNote(note);
+                                getParentFragmentManager().popBackStack();
+                            }
+                        }
+                    })
+                    .setNegativeButton("No", null).show();
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,21 +1,14 @@
 package com.example.Notes_App.domain;
 
-import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import androidx.annotation.StringRes;
 
 import java.util.Date;
 
 public class Note implements Parcelable {
 
-    @SuppressLint("SupportAnnotationUsage")
-    @StringRes
     private String name;
 
-    @SuppressLint("SupportAnnotationUsage")
-    @StringRes
     private String description;
 
     private long date;

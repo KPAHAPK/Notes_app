@@ -40,13 +40,13 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/fragment_note_details_date"
-            android:clickable="true"
             style="@style/Note.Date"
             android:layout_gravity="bottom"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            tools:text="Date"
-            android:focusable="true" />
+            tools:text="Date" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
