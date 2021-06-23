@@ -1,7 +1,5 @@
 package com.example.Notes_App.domain;
 
-import com.example.Notes_App.domain.Note;
-
 public interface AppRouteManger {
     void showNotesList();
 
@@ -12,4 +10,6 @@ public interface AppRouteManger {
     void showNoteCreator();
 
     void showNoteEditor(Note note);
+
+    void back();
 }

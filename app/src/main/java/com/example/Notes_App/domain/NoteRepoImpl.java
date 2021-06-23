@@ -27,6 +27,9 @@ public class NoteRepoImpl implements NoteRepo {
 
     @Override
     public boolean addAll(List<Note> list) {
+        if (list == null) {
+            return false;
+        }
         notes.clear();
         notes.addAll(list);
         return true;

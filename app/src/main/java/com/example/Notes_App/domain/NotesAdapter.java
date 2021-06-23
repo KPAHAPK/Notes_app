@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Notes_App.R;
@@ -15,11 +16,23 @@ import java.util.List;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
+    Fragment fragment;
+    private OnNoteViewClickListener clickListener;
+    private OnNoteViewLongClickListener longClickListener;
+    private final List<Note> notesList = new ArrayList<>();
+
+    public NotesAdapter(Fragment fragment) {
+        this.fragment = fragment;
+    }
+
     public interface OnNoteViewClickListener {
         void onNoteClickListener(@NonNull Note note);
     }
 
-    OnNoteViewClickListener clickListener;
+    public interface OnNoteViewLongClickListener {
+        void onNoteViewLongClickListener(@NonNull Note note, int index);
+    }
+
 
     public OnNoteViewClickListener getClickListener() {
         return clickListener;
@@ -29,7 +42,33 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         this.clickListener = clickListener;
     }
 
-    private final List<Note> notesList = new ArrayList<>();
+    public OnNoteViewLongClickListener getLongClickListener() {
+        return longClickListener;
+    }
+
+    public void setLongClickListener(OnNoteViewLongClickListener longClickListener) {
+        this.longClickListener = longClickListener;
+    }
+
+    public boolean removeNote(Note note) {
+        return notesList.remove(note);
+    }
+
+    public boolean updateNote(Note note) {
+        for (int i = 0; i < notesList.size(); i++) {
+
+            Note item = notesList.get(i);
+
+            if (item.getId().equals(note.getId())) {
+
+                notesList.remove(i);
+                notesList.add(i, note);
+
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void setData(List<Note> list) {
         notesList.clear();
@@ -48,9 +87,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         Note note = notesList.get(position);
 
-        holder.noteName.setText(note.getName());
-        holder.noteDescription.setText(note.getDescription());
-        holder.noteDate.setText(note.getDate());
+        holder.bind(note);
+
+
     }
 
     @Override
@@ -67,15 +106,35 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            fragment.registerForContextMenu(itemView);
+
             itemView.setOnClickListener(v -> {
                 if (getClickListener() != null) {
                     getClickListener().onNoteClickListener(notesList.get(getAdapterPosition()));
                 }
             });
 
+            itemView.setOnLongClickListener(v -> {
+                itemView.showContextMenu();
+
+                if (getLongClickListener() != null) {
+                    int index = getAdapterPosition();
+                    getLongClickListener().onNoteViewLongClickListener(notesList.get(index), index);
+                }
+
+                return true;
+            });
+
+
             noteName = itemView.findViewById(R.id.item_note_name);
             noteDescription = itemView.findViewById(R.id.item_note_description);
             noteDate = itemView.findViewById(R.id.item_note_date);
+        }
+
+        public void bind(Note note) {
+            noteName.setText(note.getName());
+            noteDescription.setText(note.getDescription());
+            noteDate.setText(note.getFromatedDate());
         }
     }
 }
