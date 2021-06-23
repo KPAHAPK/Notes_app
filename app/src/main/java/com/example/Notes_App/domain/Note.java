@@ -3,7 +3,9 @@ package com.example.Notes_App.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class Note implements Parcelable {
 
@@ -18,6 +20,7 @@ public class Note implements Parcelable {
         this.description = description;
         this.date = date;
     }
+
 
     protected Note(Parcel in) {
         name = in.readString();
@@ -37,20 +40,6 @@ public class Note implements Parcelable {
         }
     };
 
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(description);
-        dest.writeLong(date);
-    }
-
-
     public String getName() {
         return name;
     }
@@ -67,11 +56,24 @@ public class Note implements Parcelable {
         this.description = description;
     }
 
-    public Date getDate() {
-        return new Date(date);
+    public String getDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
+        return sdf.format(new Date(date));
     }
 
     public void setDate(long date) {
         this.date = date;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeLong(date);
     }
 }

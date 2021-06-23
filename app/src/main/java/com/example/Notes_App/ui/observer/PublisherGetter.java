@@ -1,4 +1,4 @@
-package com.example.Notes_App;
+package com.example.Notes_App.ui.observer;
 
 public interface PublisherGetter {
 
