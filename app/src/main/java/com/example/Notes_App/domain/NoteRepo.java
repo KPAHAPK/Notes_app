@@ -8,4 +8,6 @@ public interface NoteRepo {
     boolean addNote(Note note);
 
     boolean removeNote(Note note);
+
+    boolean addAll(List<Note> list);
 }

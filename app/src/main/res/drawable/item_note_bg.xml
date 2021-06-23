@@ -6,7 +6,6 @@
             <gradient android:endColor="#B6C59F" android:startColor="#65B568" android:type="linear" />
             <stroke android:width="2dp" android:color="@color/black" />
         </shape>
-
     </item>
 
     <item>
@@ -15,7 +14,6 @@
             <gradient android:endColor="@color/white" android:startColor="#8ABD8C" android:type="linear" />
             <stroke android:width="2dp" android:color="@color/black" />
         </shape>
-
     </item>
 
 </selector>
