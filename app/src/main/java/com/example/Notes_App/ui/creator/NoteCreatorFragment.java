@@ -14,11 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.Notes_App.domain.NotesStorage;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.domain.NotesAdapter;
+import com.example.Notes_App.domain.NotesStorage;
+
+import java.util.UUID;
 
 public class NoteCreatorFragment extends Fragment {
 
@@ -27,7 +28,6 @@ public class NoteCreatorFragment extends Fragment {
     Note note;
     NoteRepoImpl noteRepo;
     NotesStorage notesStorage;
-    NotesAdapter notesAdapter;
 
     EditText editText;
     EditText editText1;
@@ -52,7 +52,6 @@ public class NoteCreatorFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         noteRepo = new NoteRepoImpl();
-        notesAdapter = new NotesAdapter();
         notesStorage = new NotesStorage(requireContext());
         super.onCreate(savedInstanceState);
     }
@@ -82,7 +81,7 @@ public class NoteCreatorFragment extends Fragment {
             String noteDescription = editText1.getText().toString();
             long noteDate = System.currentTimeMillis();
 
-            note = new Note(noteName, noteDescription, noteDate);
+            note = new Note(UUID.randomUUID(), noteName, noteDescription, noteDate);
             noteRepo.addNote(note);
             notesStorage.setList("notes", noteRepo.getNotes());
 
