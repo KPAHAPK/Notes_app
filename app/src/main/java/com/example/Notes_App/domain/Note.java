@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.UUID;
 
 public class Note implements Parcelable {
 
@@ -77,7 +76,7 @@ public class Note implements Parcelable {
         return sdf.format(new Date(date.getTime()));
     }
 
-    public Date getDate(){
+    public Date getDate() {
         return date;
     }
 

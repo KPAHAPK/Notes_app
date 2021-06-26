@@ -20,7 +20,6 @@ import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
-//import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.ParseException;
@@ -42,7 +41,7 @@ public class NoteEditorFragment extends Fragment {
     MaterialTextView noteDate;
     AppRouteManger appRouteManger;
     long dateMilliseconds;
-//    NotesStorage notesStorage;
+    //    NotesStorage notesStorage;
     NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
 
     public static NoteEditorFragment newInstance(Note note) {
@@ -56,7 +55,7 @@ public class NoteEditorFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (requireActivity() instanceof AppRouteManger){
+        if (requireActivity() instanceof AppRouteManger) {
             appRouteManger = (AppRouteManger) requireActivity();
         }
     }
@@ -122,7 +121,7 @@ public class NoteEditorFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.confirm_edit_option){
+        if (item.getItemId() == R.id.confirm_edit_option) {
             note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), new Date(dateMilliseconds));
 
 //            notesStorage.setList("notes", noteRepo.getNotes());

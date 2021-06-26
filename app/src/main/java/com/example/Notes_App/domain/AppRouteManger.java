@@ -11,5 +11,7 @@ public interface AppRouteManger {
 
     void showNoteEditor(Note note);
 
+    void showAuth();
+
     void back();
 }

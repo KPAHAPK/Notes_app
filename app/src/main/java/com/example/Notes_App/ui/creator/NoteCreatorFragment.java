@@ -15,10 +15,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.Notes_App.R;
+import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
-//import com.example.Notes_App.domain.NotesStorage;
 
 import java.util.Date;
 import java.util.UUID;
@@ -26,6 +26,8 @@ import java.util.UUID;
 public class NoteCreatorFragment extends Fragment {
 
     public static final String TAG = "NoteAddingFragment";
+    public static final String CREATE = "createKey";
+    public static final String NEW_NOTE = "newNoteKey";
 
     Note note;
     NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
@@ -33,6 +35,7 @@ public class NoteCreatorFragment extends Fragment {
 
     EditText editText;
     EditText editText1;
+    AppRouteManger appRouteManger;
 
 
     public NoteCreatorFragment() {
@@ -48,12 +51,15 @@ public class NoteCreatorFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        if (requireActivity() instanceof AppRouteManger) {
+            appRouteManger = (AppRouteManger) requireActivity();
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-//        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -81,13 +87,15 @@ public class NoteCreatorFragment extends Fragment {
             String noteDescription = editText1.getText().toString();
             long noteDate = System.currentTimeMillis();
 
-            note = new Note( UUID.randomUUID().toString(), noteName, noteDescription, new Date(noteDate));
-            noteRepo.addNote(note);
+            note = new Note(UUID.randomUUID().toString(), noteName, noteDescription, new Date(noteDate));
+
+            noteRepo.addNote(note, result -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(NEW_NOTE, note);
+                getParentFragmentManager().setFragmentResult(CREATE, bundle);
+                appRouteManger.back();
+            });
 //            notesStorage.setList("notes", noteRepo.getNotes());
-
-            getParentFragmentManager().popBackStack();
-
-
         }
         return super.onOptionsItemSelected(item);
     }

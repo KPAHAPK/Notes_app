@@ -1,6 +1,5 @@
 package com.example.Notes_App.ui.details;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,20 +17,20 @@ import androidx.fragment.app.Fragment;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
-//import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 
 public class NoteDetailsFragment extends Fragment {
 
     public final static String TAG = "NoteDetailsFragment";
-
+    public final static String REMOVE = "delete_note";
+    public final static String REMOVED_NOTES = "deleted_note";
     private static final String ARG_PARAM1 = "param1";
 
-    DatePickerDialog datePickerDialog;
     NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
     Note note;
     AppRouteManger appRouteManger;
@@ -116,9 +115,17 @@ public class NoteDetailsFragment extends Fragment {
                     .setTitle("Are you sure about your decision?")
                     .setMessage("This note will be deleted.\nProceed?")
                     .setPositiveButton("yes", (dialog, which) -> {
-                        noteRepo.removeNote(note);
+                        noteRepo.removeNote(note, new Callback<Note>() {
+                            @Override
+                            public void onSuccess(Note result) {
+                                Bundle bundle = new Bundle();
+                                bundle.putParcelable(REMOVED_NOTES, note);
+                                getParentFragmentManager().setFragmentResult(REMOVE, bundle);
+                                appRouteManger.back();
+                            }
+                        });
 //                        notesStorage.setList("notes", noteRepo.getNotes());
-                        appRouteManger.back();
+
                     })
                     .setNegativeButton("No", null).show();
 

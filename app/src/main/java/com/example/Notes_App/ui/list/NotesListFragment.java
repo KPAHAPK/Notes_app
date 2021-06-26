@@ -26,6 +26,8 @@ import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesAdapter;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
+import com.example.Notes_App.ui.creator.NoteCreatorFragment;
+import com.example.Notes_App.ui.details.NoteDetailsFragment;
 import com.example.Notes_App.ui.editor.NoteEditorFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -100,8 +102,33 @@ public class NotesListFragment extends Fragment {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 if (result.containsKey(NoteEditorFragment.ARG_RESULT)) {
-                    notesAdapter.updateNote(result.getParcelable(NoteEditorFragment.ARG_RESULT));
+                    Note editedNote = result.getParcelable(NoteEditorFragment.ARG_RESULT);
+                    notesAdapter.updateNote(editedNote);
                     notesAdapter.notifyItemChanged(longClickIndex);
+                }
+            }
+        });
+
+        getParentFragmentManager().setFragmentResultListener(NoteCreatorFragment.CREATE, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                if (result.containsKey(NoteCreatorFragment.NEW_NOTE)) {
+                    Note createdNote = result.getParcelable(NoteCreatorFragment.NEW_NOTE);
+                    notesAdapter.add(createdNote);
+                    int position = notesAdapter.getIndex(createdNote);
+                    notesAdapter.notifyItemInserted(position);
+                }
+            }
+        });
+
+        getParentFragmentManager().setFragmentResultListener(NoteDetailsFragment.REMOVE, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                if (result.containsKey(NoteDetailsFragment.REMOVED_NOTES)) {
+                    Note removedNote = result.getParcelable(NoteDetailsFragment.REMOVED_NOTES);
+                    int position = notesAdapter.getIndex(removedNote);
+                    notesAdapter.removeNote(removedNote);
+                    notesAdapter.notifyItemRemoved(position);
                 }
             }
         });
@@ -161,9 +188,10 @@ public class NotesListFragment extends Fragment {
                     .setTitle("Are you sure about your decision?")
                     .setMessage("This note will be deleted.\nProceed?")
                     .setPositiveButton("yes", (dialog, which) -> {
-                        noteRepo.removeNote(longClickNote);
-                        notesAdapter.removeNote(longClickNote);
-                        notesAdapter.notifyItemRemoved(longClickIndex);
+                        noteRepo.removeNote(longClickNote, result -> {
+                            notesAdapter.removeNote(longClickNote);
+                            notesAdapter.notifyItemRemoved(longClickIndex);
+                        });
 //                        notesStorage.setList("notes", noteRepo.getNotes());
                     })
                     .setNegativeButton("No", null).show();
@@ -182,6 +210,10 @@ public class NotesListFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_note_option) {
             appRouteManger.showNoteCreator();
+        }
+        if (item.getItemId() == R.id.clear_all_option) {
+            notesAdapter.clearAll();
+            notesAdapter.notifyItemRangeRemoved(0, notesAdapter.getItemCount());
         }
         return super.onOptionsItemSelected(item);
     }

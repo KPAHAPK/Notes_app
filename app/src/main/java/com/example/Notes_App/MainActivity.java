@@ -11,10 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
 
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.ui.about.AboutFragment;
+import com.example.Notes_App.ui.auth.AuthFragment;
 import com.example.Notes_App.ui.creator.NoteCreatorFragment;
 import com.example.Notes_App.ui.details.NoteDetailsFragment;
 import com.example.Notes_App.ui.editor.NoteEditorFragment;
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
         NavigationView navigationView = findViewById(R.id.navigation_view);
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.my_notes_option){
+            if (item.getItemId() == R.id.my_notes_option) {
                 showNotesList();
                 return true;
             }
@@ -65,8 +67,15 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
 
 
         if (savedInstanceState == null) {
-            showNotesList();
+            showAuth();
         }
+
+        getSupportFragmentManager().setFragmentResultListener(AuthFragment.AUTH_RESULT, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull  String requestKey, @NonNull Bundle result) {
+                showAuth();
+            }
+        });
 
     }
     //TODO: Landscape orientation mode
@@ -111,6 +120,14 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
                 .beginTransaction()
                 .addToBackStack(NoteCreatorFragment.TAG)
                 .replace(R.id.main_container, NoteEditorFragment.newInstance(note), NoteEditorFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void showAuth() {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.main_container, AuthFragment.newInstance(), AuthFragment.TAG)
                 .commit();
     }
 

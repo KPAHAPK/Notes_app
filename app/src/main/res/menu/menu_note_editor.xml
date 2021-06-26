@@ -2,9 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/confirm_edit_option"
+    <item
+        android:id="@+id/confirm_edit_option"
         android:title="@string/confirm_edit_option"
         android:icon="@drawable/ic_baseline_check_24"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
 </menu>

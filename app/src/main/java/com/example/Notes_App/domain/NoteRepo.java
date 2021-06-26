@@ -8,9 +8,9 @@ public interface NoteRepo {
 
     void getNotes(Callback<List<Note>> callback);
 
-    boolean addNote(Note note);
+    void addNote(Note note, Callback<Note> callback);
 
-    boolean removeNote(Note note);
+    void removeNote(Note note, Callback<Note> callback);
 
     boolean addAll(List<Note> list);
 }

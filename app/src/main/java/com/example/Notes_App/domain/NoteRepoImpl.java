@@ -21,15 +21,15 @@ public class NoteRepoImpl implements NoteRepo {
     }
 
     @Override
-    public boolean addNote(Note note) {
+    public void addNote(Note note, Callback<Note> callback) {
         notes.add(note);
-        return true;
+        callback.onSuccess(note);
+
     }
 
     @Override
-    public boolean removeNote(Note note) {
+    public void removeNote(Note note, Callback<Note> callback) {
         notes.remove(note);
-        return true;
     }
 
     @Override

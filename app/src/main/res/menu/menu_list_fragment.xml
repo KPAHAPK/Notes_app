@@ -15,4 +15,10 @@
         app:showAsAction="ifRoom"
         android:title="Search" />
 
+    <item
+        android:id="@+id/clear_all_option"
+        android:icon="@drawable/ic_baseline_delete_forever_24"
+        app:showAsAction="ifRoom"
+        android:title="Clear all" />
+
 </menu>
