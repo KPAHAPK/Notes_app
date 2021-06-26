@@ -7,10 +7,17 @@ public class NoteRepoImpl implements NoteRepo {
 
     private static final List<Note> notes = new ArrayList<>();
 
+    public static final NoteRepo INSTANCE = new NoteRepoImpl();
+
     @Override
     public List<Note> getNotes() {
 
         return notes;
+    }
+
+    @Override
+    public void getNotes(Callback<List<Note>> callback) {
+
     }
 
     @Override

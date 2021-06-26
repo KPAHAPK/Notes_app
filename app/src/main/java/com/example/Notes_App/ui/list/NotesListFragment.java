@@ -21,8 +21,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
+import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NoteRepoImpl;
 import com.example.Notes_App.domain.NotesAdapter;
+import com.example.Notes_App.domain.NotesFirestoreRepository;
 import com.example.Notes_App.domain.NotesStorage;
 import com.example.Notes_App.ui.editor.NoteEditorFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -33,7 +35,7 @@ public class NotesListFragment extends Fragment {
 
     public final static String TAG = "NotesListFragment";
 
-    NoteRepoImpl noteRepo;
+    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
     AppRouteManger appRouteManger;
     NotesStorage notesStorage;
     private int longClickIndex;
@@ -66,7 +68,7 @@ public class NotesListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         notesStorage = new NotesStorage(requireContext());
-        noteRepo = new NoteRepoImpl();
+//        noteRepo = new NoteRepoImpl();
         notesAdapter = new NotesAdapter(this);
 
         notesAdapter.setClickListener(appRouteManger::showNoteDetails);

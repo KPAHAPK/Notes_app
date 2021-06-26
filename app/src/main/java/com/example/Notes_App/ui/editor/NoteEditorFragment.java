@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
+import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NoteRepoImpl;
+import com.example.Notes_App.domain.NotesFirestoreRepository;
 import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -42,7 +44,7 @@ public class NoteEditorFragment extends Fragment {
     AppRouteManger appRouteManger;
     long dateMilliseconds;
     NotesStorage notesStorage;
-    NoteRepoImpl noteRepo;
+    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
 
     public static NoteEditorFragment newInstance(Note note) {
         NoteEditorFragment fragment = new NoteEditorFragment();
@@ -67,7 +69,7 @@ public class NoteEditorFragment extends Fragment {
             note = getArguments().getParcelable(ARG_PARAM1);
         }
         notesStorage = new NotesStorage(requireContext());
-        noteRepo = new NoteRepoImpl();
+//        noteRepo = new NoteRepoImpl();
         setHasOptionsMenu(true);
     }
 
@@ -88,7 +90,7 @@ public class NoteEditorFragment extends Fragment {
         noteName.setText(note.getName());
         noteDescription.setText(note.getDescription());
         noteDate.setText(note.getFromatedDate());
-        dateMilliseconds = note.getDate();
+        dateMilliseconds = note.getDate().getTime();
 
 
         noteDate.setOnClickListener(v -> {
@@ -122,7 +124,7 @@ public class NoteEditorFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.confirm_edit_option){
-            note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), dateMilliseconds);
+            note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), new Date(dateMilliseconds));
 
             notesStorage.setList("notes", noteRepo.getNotes());
 

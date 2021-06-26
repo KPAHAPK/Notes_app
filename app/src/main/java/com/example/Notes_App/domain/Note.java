@@ -10,12 +10,12 @@ import java.util.UUID;
 
 public class Note implements Parcelable {
 
-    private UUID id;
+    private String id;
     private String name;
     private String description;
-    private long date;
+    private Date date;
 
-    public Note(UUID id, String name, String description, long date) {
+    public Note(String id, String name, String description, Date date) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,7 +26,7 @@ public class Note implements Parcelable {
     protected Note(Parcel in) {
         name = in.readString();
         description = in.readString();
-        date = in.readLong();
+        date = new Date(in.readLong());
     }
 
     public static final Creator<Note> CREATOR = new Creator<Note>() {
@@ -41,7 +41,7 @@ public class Note implements Parcelable {
         }
     };
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -53,7 +53,7 @@ public class Note implements Parcelable {
         this.name = name;
     }
 
-    public void updateNote(String name, String description, long date) {
+    public void updateNote(String name, String description, Date date) {
         if (name != null) {
             setName(name);
         }
@@ -74,14 +74,14 @@ public class Note implements Parcelable {
 
     public String getFromatedDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
-        return sdf.format(new Date(date));
+        return sdf.format(new Date(date.getTime()));
     }
 
-    public long getDate(){
+    public Date getDate(){
         return date;
     }
 
-    public void setDate(long date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -94,6 +94,6 @@ public class Note implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(description);
-        dest.writeLong(date);
+        dest.writeLong(date.getTime());
     }
 }

@@ -16,9 +16,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
+import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NoteRepoImpl;
+import com.example.Notes_App.domain.NotesFirestoreRepository;
 import com.example.Notes_App.domain.NotesStorage;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class NoteCreatorFragment extends Fragment {
@@ -26,7 +29,7 @@ public class NoteCreatorFragment extends Fragment {
     public static final String TAG = "NoteAddingFragment";
 
     Note note;
-    NoteRepoImpl noteRepo;
+    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
     NotesStorage notesStorage;
 
     EditText editText;
@@ -51,7 +54,7 @@ public class NoteCreatorFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        noteRepo = new NoteRepoImpl();
+//        noteRepo = new NoteRepoImpl();
         notesStorage = new NotesStorage(requireContext());
         super.onCreate(savedInstanceState);
     }
@@ -81,7 +84,7 @@ public class NoteCreatorFragment extends Fragment {
             String noteDescription = editText1.getText().toString();
             long noteDate = System.currentTimeMillis();
 
-            note = new Note(UUID.randomUUID(), noteName, noteDescription, noteDate);
+            note = new Note( UUID.randomUUID().toString(), noteName, noteDescription, new Date(noteDate));
             noteRepo.addNote(note);
             notesStorage.setList("notes", noteRepo.getNotes());
 

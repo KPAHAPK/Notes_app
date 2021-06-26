@@ -19,7 +19,9 @@ import androidx.fragment.app.Fragment;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
+import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NoteRepoImpl;
+import com.example.Notes_App.domain.NotesFirestoreRepository;
 import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -31,7 +33,7 @@ public class NoteDetailsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
 
     DatePickerDialog datePickerDialog;
-    NoteRepoImpl noteRepo;
+    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
     Note note;
     AppRouteManger appRouteManger;
     NotesStorage notesStorage;
@@ -66,7 +68,7 @@ public class NoteDetailsFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
         notesStorage = new NotesStorage(requireContext());
-        noteRepo = new NoteRepoImpl();
+//        noteRepo = new NoteRepoImpl();
         setHasOptionsMenu(true);
     }
 
