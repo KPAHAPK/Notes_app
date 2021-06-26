@@ -19,9 +19,8 @@ import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
-import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.domain.NotesFirestoreRepository;
-import com.example.Notes_App.domain.NotesStorage;
+import com.example.Notes_App.domain.NotesFirestoreRepo;
+//import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.ParseException;
@@ -43,8 +42,8 @@ public class NoteEditorFragment extends Fragment {
     MaterialTextView noteDate;
     AppRouteManger appRouteManger;
     long dateMilliseconds;
-    NotesStorage notesStorage;
-    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
+//    NotesStorage notesStorage;
+    NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
 
     public static NoteEditorFragment newInstance(Note note) {
         NoteEditorFragment fragment = new NoteEditorFragment();
@@ -68,7 +67,7 @@ public class NoteEditorFragment extends Fragment {
         if (getArguments() != null) {
             note = getArguments().getParcelable(ARG_PARAM1);
         }
-        notesStorage = new NotesStorage(requireContext());
+//        notesStorage = new NotesStorage(requireContext());
 //        noteRepo = new NoteRepoImpl();
         setHasOptionsMenu(true);
     }
@@ -126,7 +125,7 @@ public class NoteEditorFragment extends Fragment {
         if (item.getItemId() == R.id.confirm_edit_option){
             note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), new Date(dateMilliseconds));
 
-            notesStorage.setList("notes", noteRepo.getNotes());
+//            notesStorage.setList("notes", noteRepo.getNotes());
 
             Bundle arg = new Bundle();
             arg.putParcelable(ARG_RESULT, note);

@@ -71,8 +71,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     }
 
     public void setData(List<Note> list) {
-        notesList.clear();
-        notesList.addAll(list);
+        if (list != null) {
+            notesList.clear();
+            notesList.addAll(list);
+        }
     }
 
     @NonNull

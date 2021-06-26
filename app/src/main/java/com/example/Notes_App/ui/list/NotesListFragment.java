@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,12 +21,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
-import com.example.Notes_App.domain.NoteRepoImpl;
 import com.example.Notes_App.domain.NotesAdapter;
-import com.example.Notes_App.domain.NotesFirestoreRepository;
-import com.example.Notes_App.domain.NotesStorage;
+import com.example.Notes_App.domain.NotesFirestoreRepo;
 import com.example.Notes_App.ui.editor.NoteEditorFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -35,12 +35,14 @@ public class NotesListFragment extends Fragment {
 
     public final static String TAG = "NotesListFragment";
 
-    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
+    NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
     AppRouteManger appRouteManger;
-    NotesStorage notesStorage;
+    //    NotesStorage notesStorage;
     private int longClickIndex;
     private Note longClickNote;
     public NotesAdapter notesAdapter;
+    private boolean isLoading = false;
+    private ProgressBar progressBar;
 
     public static NotesListFragment newInstance() {
         NotesListFragment fragment = new NotesListFragment();
@@ -67,9 +69,25 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notesStorage = new NotesStorage(requireContext());
+//        notesStorage = new NotesStorage(requireContext());
 //        noteRepo = new NoteRepoImpl();
         notesAdapter = new NotesAdapter(this);
+
+        isLoading = true;
+
+        noteRepo.getNotes(new Callback<List<Note>>() {
+            @Override
+            public void onSuccess(List<Note> result) {
+                notesAdapter.setData(result);
+                notesAdapter.notifyDataSetChanged();
+
+                isLoading = false;
+
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+        });
 
         notesAdapter.setClickListener(appRouteManger::showNoteDetails);
 
@@ -81,7 +99,7 @@ public class NotesListFragment extends Fragment {
         getParentFragmentManager().setFragmentResultListener(NoteEditorFragment.EDITED, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                if (result.containsKey(NoteEditorFragment.ARG_RESULT)){
+                if (result.containsKey(NoteEditorFragment.ARG_RESULT)) {
                     notesAdapter.updateNote(result.getParcelable(NoteEditorFragment.ARG_RESULT));
                     notesAdapter.notifyItemChanged(longClickIndex);
                 }
@@ -109,11 +127,17 @@ public class NotesListFragment extends Fragment {
         animator.setChangeDuration(1500L);
         recyclerView.setItemAnimator(animator);
 
-        noteRepo.addAll(notesStorage.getList("notes"));
-        List<Note> noteList = noteRepo.getNotes();
+        progressBar = view.findViewById(R.id.progress);
 
-        notesAdapter.setData(noteList);
-        notesAdapter.notifyDataSetChanged();
+        if (isLoading) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+//        noteRepo.addAll(notesStorage.getList("notes"));
+//        List<Note> noteList = noteRepo.getNotes();
+
+//        notesAdapter.setData(noteList);
+//        notesAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(notesAdapter);
     }
 
@@ -140,7 +164,7 @@ public class NotesListFragment extends Fragment {
                         noteRepo.removeNote(longClickNote);
                         notesAdapter.removeNote(longClickNote);
                         notesAdapter.notifyItemRemoved(longClickIndex);
-                        notesStorage.setList("notes", noteRepo.getNotes());
+//                        notesStorage.setList("notes", noteRepo.getNotes());
                     })
                     .setNegativeButton("No", null).show();
             return true;

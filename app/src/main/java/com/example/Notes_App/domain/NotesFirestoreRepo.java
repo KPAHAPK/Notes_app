@@ -15,13 +15,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class NotesFirestoreRepository implements NoteRepo {
+public class NotesFirestoreRepo implements NoteRepo {
 
-    public static final NoteRepo INSTANCE = new NotesFirestoreRepository();
+    public static final NoteRepo INSTANCE = new NotesFirestoreRepo();
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-    private static final String NOTES = "notes";
+    private static final String NOTES = "notesList";
     private static final String DATE = "date";
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";

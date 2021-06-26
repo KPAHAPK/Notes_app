@@ -17,9 +17,8 @@ import androidx.fragment.app.Fragment;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
-import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.domain.NotesFirestoreRepository;
-import com.example.Notes_App.domain.NotesStorage;
+import com.example.Notes_App.domain.NotesFirestoreRepo;
+//import com.example.Notes_App.domain.NotesStorage;
 
 import java.util.Date;
 import java.util.UUID;
@@ -29,8 +28,8 @@ public class NoteCreatorFragment extends Fragment {
     public static final String TAG = "NoteAddingFragment";
 
     Note note;
-    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
-    NotesStorage notesStorage;
+    NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
+//    NotesStorage notesStorage;
 
     EditText editText;
     EditText editText1;
@@ -54,9 +53,7 @@ public class NoteCreatorFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-//        noteRepo = new NoteRepoImpl();
-        notesStorage = new NotesStorage(requireContext());
-        super.onCreate(savedInstanceState);
+//        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -86,7 +83,7 @@ public class NoteCreatorFragment extends Fragment {
 
             note = new Note( UUID.randomUUID().toString(), noteName, noteDescription, new Date(noteDate));
             noteRepo.addNote(note);
-            notesStorage.setList("notes", noteRepo.getNotes());
+//            notesStorage.setList("notes", noteRepo.getNotes());
 
             getParentFragmentManager().popBackStack();
 

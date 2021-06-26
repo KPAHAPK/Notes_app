@@ -20,9 +20,8 @@ import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
-import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.domain.NotesFirestoreRepository;
-import com.example.Notes_App.domain.NotesStorage;
+import com.example.Notes_App.domain.NotesFirestoreRepo;
+//import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 
@@ -33,10 +32,10 @@ public class NoteDetailsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
 
     DatePickerDialog datePickerDialog;
-    NoteRepo noteRepo = NotesFirestoreRepository.INSTANCE;
+    NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
     Note note;
     AppRouteManger appRouteManger;
-    NotesStorage notesStorage;
+//    NotesStorage notesStorage;
 
     public NoteDetailsFragment() {
     }
@@ -67,7 +66,7 @@ public class NoteDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        notesStorage = new NotesStorage(requireContext());
+//        notesStorage = new NotesStorage(requireContext());
 //        noteRepo = new NoteRepoImpl();
         setHasOptionsMenu(true);
     }
@@ -118,7 +117,7 @@ public class NoteDetailsFragment extends Fragment {
                     .setMessage("This note will be deleted.\nProceed?")
                     .setPositiveButton("yes", (dialog, which) -> {
                         noteRepo.removeNote(note);
-                        notesStorage.setList("notes", noteRepo.getNotes());
+//                        notesStorage.setList("notes", noteRepo.getNotes());
                         appRouteManger.back();
                     })
                     .setNegativeButton("No", null).show();
