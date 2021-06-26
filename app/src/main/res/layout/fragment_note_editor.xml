@@ -24,7 +24,6 @@
             tools:text="Headline" />
 
         <ScrollView
-            android:id="@+id/fragment_note_details_description_scroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@id/fragment_note_editor_date"

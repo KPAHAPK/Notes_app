@@ -21,7 +21,6 @@ public class Note implements Parcelable {
         this.date = date;
     }
 
-
     protected Note(Parcel in) {
         name = in.readString();
         description = in.readString();

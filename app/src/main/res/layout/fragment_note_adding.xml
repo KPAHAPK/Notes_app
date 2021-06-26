@@ -24,7 +24,7 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/fragment_note_adding_name"
                 style="@style/Note.Head"
-                android:hint="Headline"
+                android:hint="@string/hint_headline"
                 android:text="" />
 
             <androidx.core.widget.NestedScrollView
@@ -36,7 +36,7 @@
                     style="@style/Note.Description"
                     android:layout_height="wrap_content"
                     android:gravity="start|top"
-                    android:hint="Description"
+                    android:hint="@string/hint_description"
                     android:text="" />
             </androidx.core.widget.NestedScrollView>
         </LinearLayout>

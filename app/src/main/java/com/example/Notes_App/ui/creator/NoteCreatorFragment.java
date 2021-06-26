@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.AppRouter;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
@@ -30,12 +31,12 @@ public class NoteCreatorFragment extends Fragment {
     public static final String NEW_NOTE = "newNoteKey";
 
     Note note;
-    NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
+    final NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
 //    NotesStorage notesStorage;
 
     EditText editText;
     EditText editText1;
-    AppRouteManger appRouteManger;
+    AppRouter appRouter;
 
 
     public NoteCreatorFragment() {
@@ -52,7 +53,7 @@ public class NoteCreatorFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (requireActivity() instanceof AppRouteManger) {
-            appRouteManger = (AppRouteManger) requireActivity();
+            appRouter = ((AppRouteManger) getActivity()).getAppRouter();
         }
     }
 
@@ -93,7 +94,7 @@ public class NoteCreatorFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(NEW_NOTE, note);
                 getParentFragmentManager().setFragmentResult(CREATE, bundle);
-                appRouteManger.back();
+                appRouter.back();
             });
 //            notesStorage.setList("notes", noteRepo.getNotes());
         }

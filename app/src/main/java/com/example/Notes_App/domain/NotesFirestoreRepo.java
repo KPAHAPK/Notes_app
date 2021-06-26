@@ -21,7 +21,7 @@ public class NotesFirestoreRepo implements NoteRepo {
 
     public static final NoteRepo INSTANCE = new NotesFirestoreRepo();
 
-    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     private static final String NOTES_LIST = "notesList";
     private static final String DATE = "date";
@@ -38,31 +38,28 @@ public class NotesFirestoreRepo implements NoteRepo {
         firebaseFirestore.collection(NOTES_LIST)
                 .orderBy(DATE, Query.Direction.ASCENDING)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isComplete()) {
+                .addOnCompleteListener(task -> {
+                    if (task.isComplete()) {
 
-                            ArrayList<Note> result = new ArrayList<>();
-                            String noteName;
-                            String noteDescription;
-                            Date noteDate;
+                        ArrayList<Note> result = new ArrayList<>();
+                        String noteName;
+                        String noteDescription;
+                        Date noteDate;
 
-                            for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(task.getResult())) {
-                                noteName = (String) queryDocumentSnapshot.get(NAME);
-                                noteDescription = (String) queryDocumentSnapshot.get(DESCRIPTION);
-                                noteDate = ((Timestamp) queryDocumentSnapshot.get(DATE)).toDate();
-                                result.add(new Note(queryDocumentSnapshot.getId(),
-                                        noteName,
-                                        noteDescription,
-                                        noteDate));
-                            }
-
-                            callback.onSuccess(result);
-
-                        } else {
-                            task.getException();
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(task.getResult())) {
+                            noteName = (String) queryDocumentSnapshot.get(NAME);
+                            noteDescription = (String) queryDocumentSnapshot.get(DESCRIPTION);
+                            noteDate = ((Timestamp) queryDocumentSnapshot.get(DATE)).toDate();
+                            result.add(new Note(queryDocumentSnapshot.getId(),
+                                    noteName,
+                                    noteDescription,
+                                    noteDate));
                         }
+
+                        callback.onSuccess(result);
+
+                    } else {
+                        task.getException();
                     }
                 });
     }
@@ -75,17 +72,14 @@ public class NotesFirestoreRepo implements NoteRepo {
         data.put(DATE, note.getDate());
         firebaseFirestore.collection(NOTES_LIST)
                 .add(data)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isComplete()) {
-                            Note newNote = new Note(task.getResult().getId(),
-                                    (String) data.get(NAME),
-                                    (String) data.get(DESCRIPTION),
-                                    (Date) data.get(DATE));
+                .addOnCompleteListener(task -> {
+                    if (task.isComplete()) {
+                        Note newNote = new Note(task.getResult().getId(),
+                                (String) data.get(NAME),
+                                (String) data.get(DESCRIPTION),
+                                (Date) data.get(DATE));
 
-                            callback.onSuccess(newNote);
-                        }
+                        callback.onSuccess(newNote);
                     }
                 });
     }
@@ -95,16 +89,12 @@ public class NotesFirestoreRepo implements NoteRepo {
         firebaseFirestore.collection(NOTES_LIST)
                 .document(note.getId())
                 .delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isComplete()) {
-                            callback.onSuccess(note);
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isComplete()) {
+                        callback.onSuccess(note);
                     }
                 });
     }
-
 
     @Override
     public boolean addAll(List<Note> list) {

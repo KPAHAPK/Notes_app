@@ -33,6 +33,11 @@ public class NoteRepoImpl implements NoteRepo {
     }
 
     @Override
+    public void removeAll(Callback<Note> callback) {
+
+    }
+
+    @Override
     public boolean addAll(List<Note> list) {
         if (list == null) {
             return false;

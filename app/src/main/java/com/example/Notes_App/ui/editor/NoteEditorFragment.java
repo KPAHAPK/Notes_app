@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.AppRouter;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
@@ -39,7 +40,7 @@ public class NoteEditorFragment extends Fragment {
     AppCompatEditText noteName;
     AppCompatEditText noteDescription;
     MaterialTextView noteDate;
-    AppRouteManger appRouteManger;
+    AppRouter appRouter;
     long dateMilliseconds;
     //    NotesStorage notesStorage;
     NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
@@ -56,7 +57,8 @@ public class NoteEditorFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (requireActivity() instanceof AppRouteManger) {
-            appRouteManger = (AppRouteManger) requireActivity();
+            appRouter = ((AppRouteManger) getActivity()).getAppRouter();
+
         }
     }
 
@@ -129,7 +131,7 @@ public class NoteEditorFragment extends Fragment {
             Bundle arg = new Bundle();
             arg.putParcelable(ARG_RESULT, note);
             getParentFragmentManager().setFragmentResult(EDITED, arg);
-            appRouteManger.back();
+            appRouter.back();
         }
         return super.onOptionsItemSelected(item);
     }

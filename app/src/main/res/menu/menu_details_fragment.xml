@@ -6,13 +6,13 @@
             android:id="@+id/edit_note_option"
             android:icon="@drawable/ic_baseline_edit_24"
             app:showAsAction="ifRoom"
-            android:title="Edit" />
+            android:title="@string/edit_note_option" />
 
         <item
             android:id="@+id/delete_option"
             app:showAsAction="ifRoom"
             android:icon="@drawable/ic_baseline_delete_24"
-            android:title="Delete" />
+            android:title="@string/delete_note_option" />
     </group>
 
 </menu>

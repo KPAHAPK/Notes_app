@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.AppRouter;
 import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
@@ -38,7 +39,7 @@ public class NotesListFragment extends Fragment {
     public final static String TAG = "NotesListFragment";
 
     NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
-    AppRouteManger appRouteManger;
+    AppRouter appRouter;
     //    NotesStorage notesStorage;
     private int longClickIndex;
     private Note longClickNote;
@@ -58,14 +59,14 @@ public class NotesListFragment extends Fragment {
         super.onAttach(context);
 
         if (requireActivity() instanceof AppRouteManger) {
-            appRouteManger = (AppRouteManger) requireActivity();
+            appRouter = ((AppRouteManger) getActivity()).getAppRouter();
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        appRouteManger = null;
+        appRouter = null;
     }
 
     @Override
@@ -77,59 +78,47 @@ public class NotesListFragment extends Fragment {
 
         isLoading = true;
 
-        noteRepo.getNotes(new Callback<List<Note>>() {
-            @Override
-            public void onSuccess(List<Note> result) {
-                notesAdapter.setData(result);
-                notesAdapter.notifyDataSetChanged();
+        noteRepo.getNotes(result -> {
+            notesAdapter.setData(result);
+            notesAdapter.notifyDataSetChanged();
 
-                isLoading = false;
+            isLoading = false;
 
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
-                }
+            if (progressBar != null) {
+                progressBar.setVisibility(View.GONE);
             }
         });
 
-        notesAdapter.setClickListener(appRouteManger::showNoteDetails);
+        notesAdapter.setClickListener(appRouter::showNoteDetails);
 
         notesAdapter.setLongClickListener((note, index) -> {
             longClickIndex = index;
             longClickNote = note;
         });
 
-        getParentFragmentManager().setFragmentResultListener(NoteEditorFragment.EDITED, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                if (result.containsKey(NoteEditorFragment.ARG_RESULT)) {
-                    Note editedNote = result.getParcelable(NoteEditorFragment.ARG_RESULT);
-                    notesAdapter.updateNote(editedNote);
-                    notesAdapter.notifyItemChanged(longClickIndex);
-                }
+        getParentFragmentManager().setFragmentResultListener(NoteEditorFragment.EDITED, this, (requestKey, result) -> {
+            if (result.containsKey(NoteEditorFragment.ARG_RESULT)) {
+                Note editedNote = result.getParcelable(NoteEditorFragment.ARG_RESULT);
+                notesAdapter.updateNote(editedNote);
+                notesAdapter.notifyItemChanged(longClickIndex);
             }
         });
 
-        getParentFragmentManager().setFragmentResultListener(NoteCreatorFragment.CREATE, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                if (result.containsKey(NoteCreatorFragment.NEW_NOTE)) {
-                    Note createdNote = result.getParcelable(NoteCreatorFragment.NEW_NOTE);
-                    notesAdapter.add(createdNote);
-                    int position = notesAdapter.getIndex(createdNote);
-                    notesAdapter.notifyItemInserted(position);
-                }
+        getParentFragmentManager().setFragmentResultListener(NoteCreatorFragment.CREATE, this, (requestKey, result) -> {
+            if (result.containsKey(NoteCreatorFragment.NEW_NOTE)) {
+                Note createdNote = result.getParcelable(NoteCreatorFragment.NEW_NOTE);
+                notesAdapter.add(createdNote);
+                int position = notesAdapter.getIndex(createdNote);
+                notesAdapter.notifyItemInserted(position);
             }
         });
 
-        getParentFragmentManager().setFragmentResultListener(NoteDetailsFragment.REMOVE, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                if (result.containsKey(NoteDetailsFragment.REMOVED_NOTES)) {
-                    Note removedNote = result.getParcelable(NoteDetailsFragment.REMOVED_NOTES);
-                    int position = notesAdapter.getIndex(removedNote);
-                    notesAdapter.removeNote(removedNote);
-                    notesAdapter.notifyItemRemoved(position);
-                }
+        getParentFragmentManager().setFragmentResultListener(NoteDetailsFragment.REMOVE, this, (requestKey, result) -> {
+            if (result.containsKey(NoteDetailsFragment.REMOVED_NOTES)) {
+                Note removedNote = result.getParcelable(NoteDetailsFragment.REMOVED_NOTES);
+                int position = notesAdapter.getIndex(removedNote);
+                notesAdapter.removeNote(removedNote);
+                notesAdapter.notifyItemRemoved(position);
             }
         });
         setHasOptionsMenu(true);
@@ -178,7 +167,7 @@ public class NotesListFragment extends Fragment {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
 
         if (item.getItemId() == R.id.action_edit) {
-            appRouteManger.showNoteEditor(longClickNote);
+            appRouter.showNoteEditor(longClickNote);
             return true;
         }
 
@@ -209,11 +198,9 @@ public class NotesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_note_option) {
-            appRouteManger.showNoteCreator();
+            appRouter.showNoteCreator();
         }
         if (item.getItemId() == R.id.clear_all_option) {
-            notesAdapter.clearAll();
-            notesAdapter.notifyItemRangeRemoved(0, notesAdapter.getItemCount());
         }
         return super.onOptionsItemSelected(item);
     }

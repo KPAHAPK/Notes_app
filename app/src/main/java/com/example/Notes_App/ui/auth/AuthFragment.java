@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -32,14 +31,16 @@ public class AuthFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable  Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestProfile()
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(requireContext(), googleSignInOptions);
+
     }
 
     @Override
@@ -51,27 +52,26 @@ public class AuthFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = googleSignInClient.getSignInIntent();
-                startActivityForResult(intent,AUTH_KEY);
-            }
+        view.findViewById(R.id.google_button).setOnClickListener(v -> {
+            Intent intent = googleSignInClient.getSignInIntent();
+            startActivityForResult(intent, AUTH_KEY);
         });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AUTH_KEY){
+        if (requestCode == AUTH_KEY) {
             Task<GoogleSignInAccount> accountTask = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
                 GoogleSignInAccount account = accountTask.getResult();
                 getParentFragmentManager().setFragmentResult(AUTH_RESULT, new Bundle());
-            }catch (Exception e){
+            } catch (Exception e) {
                 Toast.makeText(requireContext(), "Auth failed", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
 }
+
