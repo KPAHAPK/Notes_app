@@ -123,7 +123,6 @@ public class NoteDetailsFragment extends Fragment {
                             appRouter.back();
                         });
 //                        notesStorage.setList("notes", noteRepo.getNotes());
-
                     })
                     .setNegativeButton("No", null).show();
 

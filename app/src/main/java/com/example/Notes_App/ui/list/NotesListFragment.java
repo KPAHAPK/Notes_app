@@ -21,17 +21,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.AppRouter;
-import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesAdapter;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
+import com.example.Notes_App.ui.DialogFragments.RemoveAllDialogFragment;
+import com.example.Notes_App.ui.DialogFragments.RemoveDialogFragment;
 import com.example.Notes_App.ui.creator.NoteCreatorFragment;
-import com.example.Notes_App.ui.details.NoteDetailsFragment;
 import com.example.Notes_App.ui.editor.NoteEditorFragment;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import java.util.List;
 
 public class NotesListFragment extends Fragment {
 
@@ -56,7 +53,6 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         if (requireActivity() instanceof AppRouteManger) {
             appRouter = ((AppRouteManger) getActivity()).getAppRouter();
         }
@@ -81,7 +77,6 @@ public class NotesListFragment extends Fragment {
 
         setNoteEditorResult();
         setNoteCreatorResult();
-        setNoteRemoverResult();
 
         setHasOptionsMenu(true);
     }
@@ -100,18 +95,13 @@ public class NotesListFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.notes_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        DefaultItemAnimator animator = new DefaultItemAnimator();
-        animator.setRemoveDuration(1500L);
-        animator.setAddDuration(1500L);
-        animator.setChangeDuration(1500L);
-        recyclerView.setItemAnimator(animator);
+        setRecyclerViewAnimation(recyclerView);
 
         progressBar = view.findViewById(R.id.progress);
 
         if (isLoading) {
             progressBar.setVisibility(View.VISIBLE);
         }
-
 //        noteRepo.addAll(notesStorage.getList("notes"));
 //        List<Note> noteList = noteRepo.getNotes();
 
@@ -119,6 +109,7 @@ public class NotesListFragment extends Fragment {
 //        notesAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(notesAdapter);
     }
+
 
     @Override
     public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
@@ -135,21 +126,11 @@ public class NotesListFragment extends Fragment {
         }
 
         if (item.getItemId() == R.id.action_delete) {
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setIcon(R.drawable.ic_baseline_warning_24)
-                    .setTitle("Are you sure about your decision?")
-                    .setMessage("This note will be deleted.\nProceed?")
-                    .setPositiveButton("yes", (dialog, which) -> {
-                        noteRepo.removeNote(longClickNote, result -> {
-                            notesAdapter.removeNote(longClickNote);
-                            notesAdapter.notifyItemRemoved(longClickIndex);
-                        });
-//                        notesStorage.setList("notes", noteRepo.getNotes());
-                    })
-                    .setNegativeButton("No", null).show();
+            showRemoveDialogFragment();
+            setNoteRemoverResult();
+//          notesStorage.setList("notes", noteRepo.getNotes());
             return true;
         }
-
         return super.onContextItemSelected(item);
     }
 
@@ -164,24 +145,28 @@ public class NotesListFragment extends Fragment {
             appRouter.showNoteCreator();
         }
         if (item.getItemId() == R.id.remove_all_option) {
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setIcon(R.drawable.ic_baseline_warning_24)
-                    .setTitle("Are you sure about your decision?")
-                    .setMessage("This note will be deleted.\nProceed?")
-                    .setPositiveButton("yes", (dialog, which) -> {
-                    })
-                    .setNegativeButton("No", null).show();
-            noteRepo.removeAllCollection(new Callback<List<Note>>() {
-                @Override
-                public void onSuccess(List<Note> result) {
-                    int itemCount = notesAdapter.getItemCount();
-                    notesAdapter.removeAll();
-                    notesAdapter.notifyItemRangeRemoved(0, itemCount);
-                }
-            });
+            showRemoveAllDialogFragment();
+            setAllNotesRemoverResult();
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void setRecyclerViewAnimation(RecyclerView recyclerView) {
+        DefaultItemAnimator animator = new DefaultItemAnimator();
+        animator.setRemoveDuration(1500L);
+        animator.setAddDuration(1500L);
+        animator.setChangeDuration(1500L);
+        recyclerView.setItemAnimator(animator);
+    }
+
+    private void showRemoveAllDialogFragment() {
+        RemoveAllDialogFragment.newInstance().show(getChildFragmentManager(), RemoveAllDialogFragment.TAG);
+    }
+
+    private void showRemoveDialogFragment() {
+        RemoveDialogFragment.newInstance().show(getChildFragmentManager(), RemoveDialogFragment.TAG);
+    }
+
 
     private void loadNotesList() {
         isLoading = true;
@@ -207,15 +192,22 @@ public class NotesListFragment extends Fragment {
         });
     }
 
+    private void setAllNotesRemoverResult() {
+        getChildFragmentManager().setFragmentResultListener(RemoveAllDialogFragment.YES, getViewLifecycleOwner(), (requestKey, result) ->
+                noteRepo.removeAllCollection(result1 -> {
+                    int itemCount = notesAdapter.getItemCount();
+                    notesAdapter.removeAll();
+                    notesAdapter.notifyItemRangeRemoved(0, itemCount);
+                }));
+
+    }
+
     private void setNoteRemoverResult() {
-        getParentFragmentManager().setFragmentResultListener(NoteDetailsFragment.REMOVE, this, (requestKey, result) -> {
-            if (result.containsKey(NoteDetailsFragment.REMOVED_NOTES)) {
-                Note removedNote = result.getParcelable(NoteDetailsFragment.REMOVED_NOTES);
-                int position = notesAdapter.getIndex(removedNote);
-                notesAdapter.removeNote(removedNote);
-                notesAdapter.notifyItemRemoved(position);
-            }
-        });
+        getChildFragmentManager().setFragmentResultListener(RemoveDialogFragment.YES, getViewLifecycleOwner(), (requestKey, result) ->
+                noteRepo.removeNote(longClickNote, result1 -> {
+                    notesAdapter.removeNote(longClickNote);
+                    notesAdapter.notifyItemRemoved(longClickIndex);
+                }));
     }
 
     private void setNoteCreatorResult() {

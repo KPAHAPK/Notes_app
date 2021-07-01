@@ -3,6 +3,7 @@ package com.example.Notes_App.domain;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.Notes_App.R;
+import com.example.Notes_App.ui.DialogFragments.RemoveAllDialogFragment;
 import com.example.Notes_App.ui.about.AboutFragment;
 import com.example.Notes_App.ui.auth.AuthFragment;
 import com.example.Notes_App.ui.creator.NoteCreatorFragment;
@@ -61,6 +62,8 @@ public class AppRouter {
                 .replace(R.id.main_container, AuthFragment.newInstance(), AuthFragment.TAG)
                 .commit();
     }
+
+
 
     public void back() {
         fragmentManager.popBackStack();

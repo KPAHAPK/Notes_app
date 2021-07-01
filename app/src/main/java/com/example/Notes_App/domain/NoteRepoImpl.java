@@ -33,7 +33,7 @@ public class NoteRepoImpl implements NoteRepo {
     }
 
     @Override
-    public void removeAllCollection(Callback<List<Note>> callback) {
+    public void removeAllCollection(Callback callback) {
 
     }
 

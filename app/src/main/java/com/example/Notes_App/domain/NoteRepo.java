@@ -12,7 +12,7 @@ public interface NoteRepo {
 
     void updateNote(Note note, Callback<Note> callback);
 
-    void removeAllCollection(Callback<List<Note>> callback);
+    void removeAllCollection(Callback callback);
 
     boolean addAll(List<Note> list);
 }

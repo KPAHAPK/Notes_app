@@ -111,16 +111,13 @@ public class NotesFirestoreRepo implements NoteRepo {
     }
 
     @Override
-    public void removeAllCollection(Callback<List<Note>> callback) {
+    public void removeAllCollection(Callback callback) {
         firebaseFirestore.collection(NOTES_LIST)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isComplete()) {
 
                         ArrayList<Note> result = new ArrayList<Note>();
-                        String noteName;
-                        String noteDescription;
-                        Date noteDate;
 
                         for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(task.getResult())) {
                             firebaseFirestore.collection(NOTES_LIST).document(queryDocumentSnapshot.getId()).delete();
