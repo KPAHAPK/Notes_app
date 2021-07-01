@@ -6,16 +6,17 @@ import android.os.Parcelable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 public class Note implements Parcelable {
 
+    private UUID id;
     private String name;
-
     private String description;
-
     private long date;
 
-    public Note(String name, String description, long date) {
+    public Note(UUID id, String name, String description, long date) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.date = date;
@@ -40,12 +41,27 @@ public class Note implements Parcelable {
         }
     };
 
+    public UUID getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void updateNote(String name, String description, long date) {
+        if (name != null) {
+            setName(name);
+        }
+        if (description != null) {
+            setDescription(description);
+        }
+
+        setDate(date);
     }
 
     public String getDescription() {
@@ -56,9 +72,13 @@ public class Note implements Parcelable {
         this.description = description;
     }
 
-    public String getDate() {
+    public String getFromatedDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
         return sdf.format(new Date(date));
+    }
+
+    public long getDate(){
+        return date;
     }
 
     public void setDate(long date) {

@@ -1,32 +1,48 @@
 package com.example.Notes_App.ui.editor;
 
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
-
 import com.example.Notes_App.R;
+import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
+import com.example.Notes_App.domain.NoteRepoImpl;
+import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.textview.MaterialTextView;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class NoteEditorFragment extends Fragment {
 
+    public static final String EDITED = "EDITED";
     public static final String TAG = "NoteEditorFragment";
-
-    private static final String ARG_PARAM1 = "param1";
+    public static final String ARG_PARAM1 = "param1";
+    public static final String ARG_RESULT = "RESULT";
 
     Note note;
     AppCompatEditText noteName;
     AppCompatEditText noteDescription;
     MaterialTextView noteDate;
+    AppRouteManger appRouteManger;
+    long dateMilliseconds;
+    NotesStorage notesStorage;
+    NoteRepoImpl noteRepo;
 
     public static NoteEditorFragment newInstance(Note note) {
         NoteEditorFragment fragment = new NoteEditorFragment();
@@ -37,11 +53,22 @@ public class NoteEditorFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (requireActivity() instanceof AppRouteManger){
+            appRouteManger = (AppRouteManger) requireActivity();
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             note = getArguments().getParcelable(ARG_PARAM1);
         }
+        notesStorage = new NotesStorage(requireContext());
+        noteRepo = new NoteRepoImpl();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -60,7 +87,50 @@ public class NoteEditorFragment extends Fragment {
 
         noteName.setText(note.getName());
         noteDescription.setText(note.getDescription());
-        noteDate.setText(note.getDate());
+        noteDate.setText(note.getFromatedDate());
+        dateMilliseconds = note.getDate();
 
+
+        noteDate.setOnClickListener(v -> {
+            final Calendar cldr = Calendar.getInstance();
+            int day = cldr.get(Calendar.DAY_OF_MONTH);
+            int month = cldr.get(Calendar.MONTH);
+            int year = cldr.get(Calendar.YEAR);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view1, year1, month1, dayOfMonth) -> {
+                String sDate = String.format(Locale.ENGLISH, "%d/%d/%d", dayOfMonth, month1, year1);
+                noteDate.setText(sDate);
+                try {
+                    Date dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH).parse(sDate);
+                    if (dateFormat != null) {
+                        dateMilliseconds = dateFormat.getTime();
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }, year, month, day);
+            datePickerDialog.show();
+        });
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_note_editor, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.confirm_edit_option){
+            note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), dateMilliseconds);
+
+            notesStorage.setList("notes", noteRepo.getNotes());
+
+            Bundle arg = new Bundle();
+            arg.putParcelable(ARG_RESULT, note);
+            getParentFragmentManager().setFragmentResult(EDITED, arg);
+            appRouteManger.back();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

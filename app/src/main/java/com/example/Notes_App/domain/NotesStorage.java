@@ -17,7 +17,7 @@ public class NotesStorage {
         sPrefs = context.getSharedPreferences("com.example.notesList", Context.MODE_PRIVATE);
     }
 
-    public <T> void setList(String key, List<T> list) {
+    public void setList(String key, List<Note> list) {
         Gson gson = new Gson();
         String json = gson.toJson(list);
 

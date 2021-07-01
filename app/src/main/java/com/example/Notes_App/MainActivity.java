@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
-import com.example.Notes_App.domain.NotesAdapter;
 import com.example.Notes_App.ui.about.AboutFragment;
 import com.example.Notes_App.ui.creator.NoteCreatorFragment;
 import com.example.Notes_App.ui.details.NoteDetailsFragment;
@@ -25,14 +24,12 @@ import com.google.android.material.navigation.NavigationView;
 public class MainActivity extends AppCompatActivity implements AppRouteManger {
 
     FragmentManager fragmentManager;
-    public static NotesAdapter notesAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        notesAdapter = new NotesAdapter();
 
         fragmentManager = getSupportFragmentManager();
 
@@ -49,6 +46,11 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
         NavigationView navigationView = findViewById(R.id.navigation_view);
 
         navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.my_notes_option){
+                showNotesList();
+                return true;
+            }
+
             if (item.getItemId() == R.id.settings_option) {
                 //TODO: setting option
                 Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
     @Override
     public void showNotesList() {
         fragmentManager.beginTransaction()
-                .addToBackStack(NotesListFragment.TAG)
                 .replace(R.id.main_container, NotesListFragment.newInstance(), NotesListFragment.TAG)
                 .commit();
     }
@@ -111,6 +112,11 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
                 .addToBackStack(NoteCreatorFragment.TAG)
                 .replace(R.id.main_container, NoteEditorFragment.newInstance(note), NoteEditorFragment.TAG)
                 .commit();
+    }
+
+    @Override
+    public void back() {
+        fragmentManager.popBackStack();
     }
 
 

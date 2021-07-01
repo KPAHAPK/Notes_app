@@ -16,18 +16,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.Notes_App.domain.AppRouteManger;
-import com.example.Notes_App.domain.NotesStorage;
 import com.example.Notes_App.R;
+import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepoImpl;
+import com.example.Notes_App.domain.NotesStorage;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 
 public class NoteDetailsFragment extends Fragment {
@@ -96,34 +90,9 @@ public class NoteDetailsFragment extends Fragment {
 
             noteName.setText(note.getName());
             noteDescription.setText(note.getDescription());
-            noteDate.setText(note.getDate().toString());
+            noteDate.setText(note.getFromatedDate());
 
         }
-//TODO: create DatePicker in Editor
-//        noteDate.setOnClickListener(v -> {
-//            final Calendar cldr = Calendar.getInstance();
-//            int day = cldr.get(Calendar.DAY_OF_MONTH);
-//            int month = cldr.get(Calendar.MONTH);
-//            int year = cldr.get(Calendar.YEAR);
-//            datePickerDialog = new DatePickerDialog(getContext(), (view1, year1, month1, dayOfMonth) -> {
-//                String sDate = String.format(Locale.ENGLISH, "%d.%d.%d", dayOfMonth, month1, year1);
-//                noteDate.setText(sDate);
-//                try {
-//                    Date dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH).parse(sDate);
-//                    long dateMilliseconds = 0;
-//                    if (dateFormat != null) {
-//                        dateMilliseconds = dateFormat.getTime();
-//                    }
-//                    if (getArguments() != null) {
-//                        Note note = getArguments().getParcelable(ARG_PARAM1);
-//                        note.setDate(dateMilliseconds);
-//                    }
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//            }, year, month, day);
-//            datePickerDialog.show();
-//        });
     }
 
     @Override
@@ -137,7 +106,6 @@ public class NoteDetailsFragment extends Fragment {
         if (item.getItemId() == R.id.edit_note_option) {
             Toast.makeText(getContext(), "Edit note", Toast.LENGTH_SHORT).show();
             appRouteManger.showNoteEditor(note);
-            //TODO: edit note option
 
         }
         if (item.getItemId() == R.id.delete_option) {
@@ -149,7 +117,7 @@ public class NoteDetailsFragment extends Fragment {
                     .setPositiveButton("yes", (dialog, which) -> {
                         noteRepo.removeNote(note);
                         notesStorage.setList("notes", noteRepo.getNotes());
-                        getParentFragmentManager().popBackStack();
+                        appRouteManger.back();
                     })
                     .setNegativeButton("No", null).show();
 
