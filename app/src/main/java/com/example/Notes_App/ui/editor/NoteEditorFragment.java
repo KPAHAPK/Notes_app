@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.AppRouter;
+import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
@@ -31,10 +32,10 @@ import java.util.Locale;
 
 public class NoteEditorFragment extends Fragment {
 
-    public static final String EDITED = "EDITED";
+    public static final String EDIT = "EDIT";
     public static final String TAG = "NoteEditorFragment";
     public static final String ARG_PARAM1 = "param1";
-    public static final String ARG_RESULT = "RESULT";
+    public static final String UPDATED_NOTE = "UPDATED_NOTE";
 
     Note note;
     AppCompatEditText noteName;
@@ -90,9 +91,38 @@ public class NoteEditorFragment extends Fragment {
         noteName.setText(note.getName());
         noteDescription.setText(note.getDescription());
         noteDate.setText(note.getFromatedDate());
+        setNewDate();
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_note_editor, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.confirm_edit_option) {
+            note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), new Date(dateMilliseconds));
+
+//            notesStorage.setList("notes", noteRepo.getNotes());
+            noteRepo.updateNote(note, new Callback<Note>() {
+                @Override
+                public void onSuccess(Note result) {
+                    Bundle arg = new Bundle();
+                    arg.putParcelable(UPDATED_NOTE, note);
+                    getParentFragmentManager().setFragmentResult(EDIT, arg);
+                    appRouter.back();
+                }
+            });
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setNewDate() {
         dateMilliseconds = note.getDate().getTime();
-
-
         noteDate.setOnClickListener(v -> {
             final Calendar cldr = Calendar.getInstance();
             int day = cldr.get(Calendar.DAY_OF_MONTH);
@@ -112,27 +142,5 @@ public class NoteEditorFragment extends Fragment {
             }, year, month, day);
             datePickerDialog.show();
         });
-
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_note_editor, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.confirm_edit_option) {
-            note.updateNote(String.valueOf(noteName.getText()), String.valueOf(noteDescription.getText()), new Date(dateMilliseconds));
-
-//            notesStorage.setList("notes", noteRepo.getNotes());
-
-            Bundle arg = new Bundle();
-            arg.putParcelable(ARG_RESULT, note);
-            getParentFragmentManager().setFragmentResult(EDITED, arg);
-            appRouter.back();
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

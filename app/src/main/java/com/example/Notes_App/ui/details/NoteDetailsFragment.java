@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.AppRouter;
-import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
@@ -28,9 +27,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 public class NoteDetailsFragment extends Fragment {
 
     public final static String TAG = "NoteDetailsFragment";
-    public final static String REMOVE = "delete_note";
-    public final static String REMOVED_NOTES = "deleted_note";
-    private static final String ARG_PARAM1 = "param1";
+    public final static String REMOVE = "remove_note";
+    public final static String REMOVED_NOTES = "removed_note";
+    private static final String SELECTED_NOTE = "SELECTED_NOTE";
 
     final NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
     Note note;
@@ -43,7 +42,7 @@ public class NoteDetailsFragment extends Fragment {
     public static NoteDetailsFragment newInstance(Note note) {
         NoteDetailsFragment fragment = new NoteDetailsFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, note);
+        args.putParcelable(SELECTED_NOTE, note);
         fragment.setArguments(args);
         return fragment;
     }
@@ -88,7 +87,7 @@ public class NoteDetailsFragment extends Fragment {
         TextView noteDate = view.findViewById(R.id.fragment_note_details_date);
 
         if (getArguments() != null) {
-            note = getArguments().getParcelable(ARG_PARAM1);
+            note = getArguments().getParcelable(SELECTED_NOTE);
 
             noteName.setText(note.getName());
             noteDescription.setText(note.getDescription());

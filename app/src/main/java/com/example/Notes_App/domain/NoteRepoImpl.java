@@ -9,11 +9,6 @@ public class NoteRepoImpl implements NoteRepo {
 
     public static final NoteRepo INSTANCE = new NoteRepoImpl();
 
-    @Override
-    public List<Note> getNotes() {
-
-        return notes;
-    }
 
     @Override
     public void getNotes(Callback<List<Note>> callback) {
@@ -33,9 +28,15 @@ public class NoteRepoImpl implements NoteRepo {
     }
 
     @Override
-    public void removeAll(Callback<Note> callback) {
+    public void updateNote(Note note, Callback<Note> callback) {
 
     }
+
+    @Override
+    public void removeAllCollection(Callback<List<Note>> callback) {
+
+    }
+
 
     @Override
     public boolean addAll(List<Note> list) {

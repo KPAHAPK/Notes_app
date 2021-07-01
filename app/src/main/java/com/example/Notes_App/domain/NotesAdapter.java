@@ -88,7 +88,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         return -1;
     }
 
-    public void clearAll() {
+    public void removeAll() {
         notesList.clear();
     }
 

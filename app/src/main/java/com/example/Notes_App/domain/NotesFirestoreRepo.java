@@ -5,11 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,11 +25,6 @@ public class NotesFirestoreRepo implements NoteRepo {
     private static final String DATE = "date";
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";
-
-    @Override
-    public List<Note> getNotes() {
-        return null;
-    }
 
     @Override
     public void getNotes(Callback<List<Note>> callback) {
@@ -92,6 +85,52 @@ public class NotesFirestoreRepo implements NoteRepo {
                 .addOnCompleteListener(task -> {
                     if (task.isComplete()) {
                         callback.onSuccess(note);
+                    }
+                });
+    }
+
+    @Override
+    public void updateNote(Note note, Callback<Note> callback) {
+        HashMap<String, Object> data = new HashMap<>();
+
+        data.put(NAME, note.getName());
+        data.put(DESCRIPTION, note.getDescription());
+        data.put(DATE, note.getDate());
+
+        firebaseFirestore.collection(NOTES_LIST)
+                .document(note.getId())
+                .update(data)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isComplete()) {
+                            callback.onSuccess(note);
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void removeAllCollection(Callback<List<Note>> callback) {
+        firebaseFirestore.collection(NOTES_LIST)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isComplete()) {
+
+                        ArrayList<Note> result = new ArrayList<Note>();
+                        String noteName;
+                        String noteDescription;
+                        Date noteDate;
+
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(task.getResult())) {
+                            firebaseFirestore.collection(NOTES_LIST).document(queryDocumentSnapshot.getId()).delete();
+                            result.remove(queryDocumentSnapshot.getId());
+                        }
+
+                        callback.onSuccess(result);
+
+                    } else {
+                        task.getException();
                     }
                 });
     }

@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -76,53 +75,17 @@ public class NotesListFragment extends Fragment {
 //        noteRepo = new NoteRepoImpl();
         notesAdapter = new NotesAdapter(this);
 
-        isLoading = true;
+        loadNotesList();
 
-        noteRepo.getNotes(result -> {
-            notesAdapter.setData(result);
-            notesAdapter.notifyDataSetChanged();
+        notesAdapterClickListeners();
 
-            isLoading = false;
+        setNoteEditorResult();
+        setNoteCreatorResult();
+        setNoteRemoverResult();
 
-            if (progressBar != null) {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
-
-        notesAdapter.setClickListener(appRouter::showNoteDetails);
-
-        notesAdapter.setLongClickListener((note, index) -> {
-            longClickIndex = index;
-            longClickNote = note;
-        });
-
-        getParentFragmentManager().setFragmentResultListener(NoteEditorFragment.EDITED, this, (requestKey, result) -> {
-            if (result.containsKey(NoteEditorFragment.ARG_RESULT)) {
-                Note editedNote = result.getParcelable(NoteEditorFragment.ARG_RESULT);
-                notesAdapter.updateNote(editedNote);
-                notesAdapter.notifyItemChanged(longClickIndex);
-            }
-        });
-
-        getParentFragmentManager().setFragmentResultListener(NoteCreatorFragment.CREATE, this, (requestKey, result) -> {
-            if (result.containsKey(NoteCreatorFragment.NEW_NOTE)) {
-                Note createdNote = result.getParcelable(NoteCreatorFragment.NEW_NOTE);
-                notesAdapter.add(createdNote);
-                int position = notesAdapter.getIndex(createdNote);
-                notesAdapter.notifyItemInserted(position);
-            }
-        });
-
-        getParentFragmentManager().setFragmentResultListener(NoteDetailsFragment.REMOVE, this, (requestKey, result) -> {
-            if (result.containsKey(NoteDetailsFragment.REMOVED_NOTES)) {
-                Note removedNote = result.getParcelable(NoteDetailsFragment.REMOVED_NOTES);
-                int position = notesAdapter.getIndex(removedNote);
-                notesAdapter.removeNote(removedNote);
-                notesAdapter.notifyItemRemoved(position);
-            }
-        });
         setHasOptionsMenu(true);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -200,8 +163,79 @@ public class NotesListFragment extends Fragment {
         if (item.getItemId() == R.id.add_note_option) {
             appRouter.showNoteCreator();
         }
-        if (item.getItemId() == R.id.clear_all_option) {
+        if (item.getItemId() == R.id.remove_all_option) {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setIcon(R.drawable.ic_baseline_warning_24)
+                    .setTitle("Are you sure about your decision?")
+                    .setMessage("This note will be deleted.\nProceed?")
+                    .setPositiveButton("yes", (dialog, which) -> {
+                    })
+                    .setNegativeButton("No", null).show();
+            noteRepo.removeAllCollection(new Callback<List<Note>>() {
+                @Override
+                public void onSuccess(List<Note> result) {
+                    int itemCount = notesAdapter.getItemCount();
+                    notesAdapter.removeAll();
+                    notesAdapter.notifyItemRangeRemoved(0, itemCount);
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadNotesList() {
+        isLoading = true;
+
+        noteRepo.getNotes(result -> {
+            notesAdapter.setData(result);
+            notesAdapter.notifyDataSetChanged();
+
+            isLoading = false;
+
+            if (progressBar != null) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void notesAdapterClickListeners() {
+        notesAdapter.setClickListener(appRouter::showNoteDetails);
+
+        notesAdapter.setLongClickListener((note, index) -> {
+            longClickIndex = index;
+            longClickNote = note;
+        });
+    }
+
+    private void setNoteRemoverResult() {
+        getParentFragmentManager().setFragmentResultListener(NoteDetailsFragment.REMOVE, this, (requestKey, result) -> {
+            if (result.containsKey(NoteDetailsFragment.REMOVED_NOTES)) {
+                Note removedNote = result.getParcelable(NoteDetailsFragment.REMOVED_NOTES);
+                int position = notesAdapter.getIndex(removedNote);
+                notesAdapter.removeNote(removedNote);
+                notesAdapter.notifyItemRemoved(position);
+            }
+        });
+    }
+
+    private void setNoteCreatorResult() {
+        getParentFragmentManager().setFragmentResultListener(NoteCreatorFragment.CREATE, this, (requestKey, result) -> {
+            if (result.containsKey(NoteCreatorFragment.NEW_NOTE)) {
+                Note createdNote = result.getParcelable(NoteCreatorFragment.NEW_NOTE);
+                notesAdapter.add(createdNote);
+                int position = notesAdapter.getIndex(createdNote);
+                notesAdapter.notifyItemInserted(position);
+            }
+        });
+    }
+
+    private void setNoteEditorResult() {
+        getParentFragmentManager().setFragmentResultListener(NoteEditorFragment.EDIT, this, (requestKey, result) -> {
+            if (result.containsKey(NoteEditorFragment.UPDATED_NOTE)) {
+                Note editedNote = result.getParcelable(NoteEditorFragment.UPDATED_NOTE);
+                notesAdapter.updateNote(editedNote);
+                notesAdapter.notifyItemChanged(longClickIndex);
+            }
+        });
     }
 }

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.example.Notes_App.R;
 import com.example.Notes_App.domain.AppRouteManger;
 import com.example.Notes_App.domain.AppRouter;
+import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
@@ -90,11 +91,14 @@ public class NoteCreatorFragment extends Fragment {
 
             note = new Note(UUID.randomUUID().toString(), noteName, noteDescription, new Date(noteDate));
 
-            noteRepo.addNote(note, result -> {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(NEW_NOTE, note);
-                getParentFragmentManager().setFragmentResult(CREATE, bundle);
-                appRouter.back();
+            noteRepo.addNote(note, new Callback<Note>() {
+                @Override
+                public void onSuccess(Note result) {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(NEW_NOTE, note);
+                    NoteCreatorFragment.this.getParentFragmentManager().setFragmentResult(CREATE, bundle);
+                    appRouter.back();
+                }
             });
 //            notesStorage.setList("notes", noteRepo.getNotes());
         }

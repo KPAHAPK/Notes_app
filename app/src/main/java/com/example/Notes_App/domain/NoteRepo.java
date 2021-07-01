@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface NoteRepo {
 
-    List<Note> getNotes();
-
     void getNotes(Callback<List<Note>> callback);
 
     void addNote(Note note, Callback<Note> callback);
 
     void removeNote(Note note, Callback<Note> callback);
+
+    void updateNote(Note note, Callback<Note> callback);
+
+    void removeAllCollection(Callback<List<Note>> callback);
 
     boolean addAll(List<Note> list);
 }
