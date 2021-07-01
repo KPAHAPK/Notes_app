@@ -1,6 +1,5 @@
 package com.example.Notes_App.ui.DialogFragments;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 
@@ -11,13 +10,14 @@ import androidx.fragment.app.DialogFragment;
 import com.example.Notes_App.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class RemoveDialogFragment extends DialogFragment {
 
-    public static final String TAG = "RemoveDialogFragment";
-    public static final String YES = "yes";
+public class NotesRemoverDialogFragment extends DialogFragment {
 
-    public static RemoveDialogFragment newInstance() {
-        return new RemoveDialogFragment();
+    public static final String TAG = "removeAllDialogFragment";
+    public static final String YES = "YES";
+
+    public static NotesRemoverDialogFragment newInstance() {
+        return new NotesRemoverDialogFragment();
     }
 
     @NonNull
@@ -26,10 +26,9 @@ public class RemoveDialogFragment extends DialogFragment {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
                 .setIcon(R.drawable.ic_baseline_warning_24)
                 .setTitle("Are you sure about your decision?")
-                .setMessage("This note will be deleted.\nProceed?")
-                .setPositiveButton(YES, (dialog, which) -> {
-                    getParentFragmentManager().setFragmentResult(YES, null);
-                })
+                .setMessage("Those notes will be deleted.\nProceed?")
+                .setCancelable(false)
+                .setPositiveButton(YES, (dialog, which) -> getParentFragmentManager().setFragmentResult(YES, null))
                 .setNegativeButton("No", null);
 
         return builder.create();

@@ -17,5 +17,10 @@
     <string name="search_option">Search</string>
     <string name="add_note_option">Add note</string>
     <string name="clear_all_option">Clear all</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="edit_fragment_dialog">Edit field</string>
+    <string name="cancel_editing_note_field">cancel</string>
+    <string name="confirm_editing_note_field">confirm</string>
 
 </resources>

@@ -25,8 +25,8 @@ import com.example.Notes_App.domain.Note;
 import com.example.Notes_App.domain.NoteRepo;
 import com.example.Notes_App.domain.NotesAdapter;
 import com.example.Notes_App.domain.NotesFirestoreRepo;
-import com.example.Notes_App.ui.DialogFragments.RemoveAllDialogFragment;
-import com.example.Notes_App.ui.DialogFragments.RemoveDialogFragment;
+import com.example.Notes_App.ui.DialogFragments.NotesRemoverDialogFragment;
+import com.example.Notes_App.ui.DialogFragments.RemoverDialogFragment;
 import com.example.Notes_App.ui.creator.NoteCreatorFragment;
 import com.example.Notes_App.ui.editor.NoteEditorFragment;
 
@@ -44,10 +44,7 @@ public class NotesListFragment extends Fragment {
     private ProgressBar progressBar;
 
     public static NotesListFragment newInstance() {
-        NotesListFragment fragment = new NotesListFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+        return new NotesListFragment();
     }
 
     @Override
@@ -160,11 +157,11 @@ public class NotesListFragment extends Fragment {
     }
 
     private void showRemoveAllDialogFragment() {
-        RemoveAllDialogFragment.newInstance().show(getChildFragmentManager(), RemoveAllDialogFragment.TAG);
+        NotesRemoverDialogFragment.newInstance().show(getChildFragmentManager(), NotesRemoverDialogFragment.TAG);
     }
 
     private void showRemoveDialogFragment() {
-        RemoveDialogFragment.newInstance().show(getChildFragmentManager(), RemoveDialogFragment.TAG);
+        RemoverDialogFragment.newInstance().show(getChildFragmentManager(), RemoverDialogFragment.TAG);
     }
 
 
@@ -193,7 +190,7 @@ public class NotesListFragment extends Fragment {
     }
 
     private void setAllNotesRemoverResult() {
-        getChildFragmentManager().setFragmentResultListener(RemoveAllDialogFragment.YES, getViewLifecycleOwner(), (requestKey, result) ->
+        getChildFragmentManager().setFragmentResultListener(NotesRemoverDialogFragment.YES, getViewLifecycleOwner(), (requestKey, result) ->
                 noteRepo.removeAllCollection(result1 -> {
                     int itemCount = notesAdapter.getItemCount();
                     notesAdapter.removeAll();
@@ -203,7 +200,7 @@ public class NotesListFragment extends Fragment {
     }
 
     private void setNoteRemoverResult() {
-        getChildFragmentManager().setFragmentResultListener(RemoveDialogFragment.YES, getViewLifecycleOwner(), (requestKey, result) ->
+        getChildFragmentManager().setFragmentResultListener(RemoverDialogFragment.YES, getViewLifecycleOwner(), (requestKey, result) ->
                 noteRepo.removeNote(longClickNote, result1 -> {
                     notesAdapter.removeNote(longClickNote);
                     notesAdapter.notifyItemRemoved(longClickIndex);
