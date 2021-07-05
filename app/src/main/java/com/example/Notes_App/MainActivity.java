@@ -10,28 +10,22 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
 
 import com.example.Notes_App.domain.AppRouteManger;
-import com.example.Notes_App.domain.Note;
-import com.example.Notes_App.ui.about.AboutFragment;
-import com.example.Notes_App.ui.creator.NoteCreatorFragment;
-import com.example.Notes_App.ui.details.NoteDetailsFragment;
-import com.example.Notes_App.ui.editor.NoteEditorFragment;
-import com.example.Notes_App.ui.list.NotesListFragment;
+import com.example.Notes_App.domain.AppRouter;
+import com.example.Notes_App.ui.auth.AuthFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements AppRouteManger {
 
-    FragmentManager fragmentManager;
-
+    private AppRouter appRouter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fragmentManager = getSupportFragmentManager();
+        appRouter = getAppRouter();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -46,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
         NavigationView navigationView = findViewById(R.id.navigation_view);
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.my_notes_option){
-                showNotesList();
+            if (item.getItemId() == R.id.my_notes_option) {
+                appRouter.showNotesList();
                 return true;
             }
 
@@ -57,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
                 return true;
             }
             if (item.getItemId() == R.id.about_option) {
-                showAbout();
+                appRouter.showAbout();
                 return true;
             }
             return false;
@@ -65,59 +59,13 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
 
 
         if (savedInstanceState == null) {
-            showNotesList();
+            appRouter.showAuth();
         }
+
+        getSupportFragmentManager().setFragmentResultListener(AuthFragment.AUTH_RESULT, this, (requestKey, result) -> appRouter.showNotesList());
 
     }
     //TODO: Landscape orientation mode
-
-
-    @Override
-    public void showNotesList() {
-        fragmentManager.beginTransaction()
-                .replace(R.id.main_container, NotesListFragment.newInstance(), NotesListFragment.TAG)
-                .commit();
-    }
-
-    @Override
-    public void showNoteDetails(Note note) {
-        fragmentManager.beginTransaction()
-                .addToBackStack(NoteDetailsFragment.TAG)
-                .replace(R.id.main_container, NoteDetailsFragment.newInstance(note), NoteDetailsFragment.TAG)
-                .commit();
-    }
-
-    @Override
-    public void showAbout() {
-        fragmentManager
-                .beginTransaction()
-                .addToBackStack(AboutFragment.TAG)
-                .replace(R.id.main_container, AboutFragment.newInstance(), AboutFragment.TAG)
-                .commit();
-    }
-
-    @Override
-    public void showNoteCreator() {
-        fragmentManager
-                .beginTransaction()
-                .addToBackStack(NoteCreatorFragment.TAG)
-                .replace(R.id.main_container, NoteCreatorFragment.newInstance(), NoteCreatorFragment.TAG)
-                .commit();
-    }
-
-    @Override
-    public void showNoteEditor(Note note) {
-        fragmentManager
-                .beginTransaction()
-                .addToBackStack(NoteCreatorFragment.TAG)
-                .replace(R.id.main_container, NoteEditorFragment.newInstance(note), NoteEditorFragment.TAG)
-                .commit();
-    }
-
-    @Override
-    public void back() {
-        fragmentManager.popBackStack();
-    }
 
 
     @Override
@@ -129,5 +77,10 @@ public class MainActivity extends AppCompatActivity implements AppRouteManger {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public AppRouter getAppRouter() {
+        return new AppRouter(getSupportFragmentManager());
     }
 }

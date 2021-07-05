@@ -71,8 +71,25 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     }
 
     public void setData(List<Note> list) {
+        if (list != null) {
+            notesList.clear();
+            notesList.addAll(list);
+        }
+    }
+
+    public void add(Note note) {
+        notesList.add(note);
+    }
+
+    public int getIndex(Note note) {
+        if (notesList.contains(note)) {
+            return notesList.indexOf(note);
+        }
+        return -1;
+    }
+
+    public void removeAll() {
         notesList.clear();
-        notesList.addAll(list);
     }
 
     @NonNull

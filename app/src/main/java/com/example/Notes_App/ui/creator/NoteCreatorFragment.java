@@ -15,22 +15,29 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.Notes_App.R;
+import com.example.Notes_App.domain.AppRouteManger;
+import com.example.Notes_App.domain.AppRouter;
+import com.example.Notes_App.domain.Callback;
 import com.example.Notes_App.domain.Note;
-import com.example.Notes_App.domain.NoteRepoImpl;
-import com.example.Notes_App.domain.NotesStorage;
+import com.example.Notes_App.domain.NoteRepo;
+import com.example.Notes_App.domain.NotesFirestoreRepo;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class NoteCreatorFragment extends Fragment {
 
     public static final String TAG = "NoteAddingFragment";
+    public static final String CREATE = "createKey";
+    public static final String NEW_NOTE = "newNoteKey";
 
     Note note;
-    NoteRepoImpl noteRepo;
-    NotesStorage notesStorage;
+    final NoteRepo noteRepo = NotesFirestoreRepo.INSTANCE;
+//    NotesStorage notesStorage;
 
     EditText editText;
     EditText editText1;
+    AppRouter appRouter;
 
 
     public NoteCreatorFragment() {
@@ -46,13 +53,14 @@ public class NoteCreatorFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        if (requireActivity() instanceof AppRouteManger) {
+            appRouter = ((AppRouteManger) getActivity()).getAppRouter();
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        noteRepo = new NoteRepoImpl();
-        notesStorage = new NotesStorage(requireContext());
         super.onCreate(savedInstanceState);
     }
 
@@ -81,13 +89,18 @@ public class NoteCreatorFragment extends Fragment {
             String noteDescription = editText1.getText().toString();
             long noteDate = System.currentTimeMillis();
 
-            note = new Note(UUID.randomUUID(), noteName, noteDescription, noteDate);
-            noteRepo.addNote(note);
-            notesStorage.setList("notes", noteRepo.getNotes());
+            note = new Note(UUID.randomUUID().toString(), noteName, noteDescription, new Date(noteDate));
 
-            getParentFragmentManager().popBackStack();
-
-
+            noteRepo.addNote(note, new Callback<Note>() {
+                @Override
+                public void onSuccess(Note result) {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(NEW_NOTE, note);
+                    NoteCreatorFragment.this.getParentFragmentManager().setFragmentResult(CREATE, bundle);
+                    appRouter.back();
+                }
+            });
+//            notesStorage.setList("notes", noteRepo.getNotes());
         }
         return super.onOptionsItemSelected(item);
     }

@@ -7,23 +7,36 @@ public class NoteRepoImpl implements NoteRepo {
 
     private static final List<Note> notes = new ArrayList<>();
 
-    @Override
-    public List<Note> getNotes() {
+    public static final NoteRepo INSTANCE = new NoteRepoImpl();
 
-        return notes;
+
+    @Override
+    public void getNotes(Callback<List<Note>> callback) {
+
     }
 
     @Override
-    public boolean addNote(Note note) {
+    public void addNote(Note note, Callback<Note> callback) {
         notes.add(note);
-        return true;
+        callback.onSuccess(note);
+
     }
 
     @Override
-    public boolean removeNote(Note note) {
+    public void removeNote(Note note, Callback<Note> callback) {
         notes.remove(note);
-        return true;
     }
+
+    @Override
+    public void updateNote(Note note, Callback<Note> callback) {
+
+    }
+
+    @Override
+    public void removeAllCollection(Callback callback) {
+
+    }
+
 
     @Override
     public boolean addAll(List<Note> list) {

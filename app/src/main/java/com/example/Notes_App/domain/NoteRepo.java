@@ -3,11 +3,16 @@ package com.example.Notes_App.domain;
 import java.util.List;
 
 public interface NoteRepo {
-    List<Note> getNotes();
 
-    boolean addNote(Note note);
+    void getNotes(Callback<List<Note>> callback);
 
-    boolean removeNote(Note note);
+    void addNote(Note note, Callback<Note> callback);
+
+    void removeNote(Note note, Callback<Note> callback);
+
+    void updateNote(Note note, Callback<Note> callback);
+
+    void removeAllCollection(Callback callback);
 
     boolean addAll(List<Note> list);
 }
